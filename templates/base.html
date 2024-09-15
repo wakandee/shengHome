@@ -16,10 +16,10 @@
         </nav>
         <nav>
             <ul class="nav-links">
-                <li class="{% if request.endpoint == 'home' %}active{% endif %}"><a href="{{ url_for('home') }}" class="nav-item">Home</a></li>
-                <li class="{% if request.endpoint == 'translate' %}active{% endif %}"><a href="{{ url_for('translate') }}" class="nav-item">Translate</a></li>
-                <li class="{% if request.endpoint == 'categories' %}active{% endif %}"><a href="{{ url_for('categories') }}" class="nav-item">Categories</a></li>
-                <li class="{% if request.endpoint == 'lyrics' %}active{% endif %}"><a href="{{ url_for('lyrics') }}" class="nav-item">Lyrics</a></li>
+                <li class="{% if request.endpoint == 'home' %}active{% endif %}"><a href="{{ url_for('home') }}" class="nav-item">{{ translations['home'] }}</a></li>
+                <li class="{% if request.endpoint == 'translate' %}active{% endif %}"><a href="{{ url_for('translate') }}" class="nav-item">{{ translations['translate'] }}</a></li>
+                <li class="{% if request.endpoint == 'categories' %}active{% endif %}"><a href="{{ url_for('categories') }}" class="nav-item">{{ translations['categories'] }}</a></li>
+                <li class="{% if request.endpoint == 'lyrics' %}active{% endif %}"><a href="{{ url_for('lyrics') }}" class="nav-item">{{ translations['lyrics'] }}</a></li>
                 <!-- <li class="{% if request.endpoint == 'trending_phrases' %}active{% endif %}"><a href="{{ url_for('trending_phrases') }}" class="nav-item">Trending Phrases</a></li> -->
                 <li class="settings-item">
                     <div class="dropdown">
@@ -36,20 +36,37 @@
                                 </label>
                             </div>
 
-                            <!-- Language Dropdown -->
-                            <a href="#">English</a>
-                            <a href="#">Kiswahili</a>
-                            <a href="#">Sheng</a>
+                            <!-- Language Dropdown with Tick for Current Language -->
+                            <div class="language-dropdown">
+                                <a href="{{ url_for('set_language', lang='en') }}">
+                                    English 
+                                    {% if request.cookies.get('language') == 'en' or not request.cookies.get('language') %}
+                                        ✓
+                                    {% endif %}
+                                </a>
+                                <a href="{{ url_for('set_language', lang='sw') }}">
+                                    Kiswahili 
+                                    {% if request.cookies.get('language') == 'sw' %}
+                                        ✓
+                                    {% endif %}
+                                </a>
+                                <a href="{{ url_for('set_language', lang='sh') }}">
+                                    Sheng 
+                                    {% if request.cookies.get('language') == 'sh' %}
+                                        ✓
+                                    {% endif %}
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </li>
 
                 {% if 'username' in session %}
-                    <li><a href="{{ url_for('logout') }}" class="nav-item">Logout</a></li>
+                    <li><a href="{{ url_for('logout') }}" class="nav-item">{{ translations['logout'] }}</a></li>
                 {% else %}
-                    <li><a href="{{ url_for('login_register') }}" class="nav-item">Login / Register</a></li>
+                    <li><a href="{{ url_for('login_register') }}" class="nav-item">{{ translations['login_register'] }}</a></li>
                 {% endif %}
-                <li class="{% if request.endpoint == 'about' %}active{% endif %}"><a href="{{ url_for('about') }}" class="nav-item">About</a></li>
+                <li class="{% if request.endpoint == 'about' %}active{% endif %}"><a href="{{ url_for('about') }}" class="nav-item">{{ translations['about'] }}</a></li>
             </ul>
         </nav>
     </header>

@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, make_response
+import json
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -6,9 +7,32 @@ app.secret_key = 'your_secret_key'
 # Dummy data for demonstration purposes
 users = {"testuser": "password"}
 
+@app.route('/set_language/<lang>')
+def set_language(lang):
+    # Set a cookie to remember the user's selected language
+    response = make_response(redirect(url_for('home')))
+    response.set_cookie('language', lang, max_age=60*60*24*30)  # Store for 30 days
+    return response
+
+# Helper function to load the appropriate language file
+def load_language(lang):
+    try:
+        with open(f'locales/{lang}.json', 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        with open('locales/en.json', 'r') as f:
+            return json.load(f)
+
 @app.route('/')
 def home():
-    return render_template('home.html')
+    # Detect the user's preferred language from a cookie or default to 'en' (English)
+    language = request.cookies.get('language') or 'en'
+    
+    # Load the corresponding language file from the 'locales' folder
+    translations = load_language(language)
+    
+    # Render the HTML template with translations passed to it
+    return render_template('home.html', translations=translations)
 
 @app.route('/login_register', methods=['GET', 'POST'])
 def login_register():
@@ -31,7 +55,11 @@ def login_register():
             else:
                 return "User already exists!"
                 
-    return render_template('login_register.html')
+    # Detect the user's preferred language from a cookie or default to 'en' (English)
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    
+    return render_template('login_register.html', translations=translations)
 
 @app.route('/logout')
 def logout():
@@ -44,26 +72,48 @@ def translate():
         sheng_word = request.form['sheng_word']
         # Add translation logic here
         translated_word = "Example Translation"  # Replace with actual translation
-        return render_template('translate.html', translated_word=translated_word)
-    return render_template('translate.html')
+        # Detect the user's preferred language from a cookie or default to 'en' (English)
+        language = request.cookies.get('language') or 'en'
+        translations = load_language(language)
+        return render_template('translate.html', translated_word=translated_word, translations=translations)
+    
+    # Detect the user's preferred language from a cookie or default to 'en' (English)
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    
+    return render_template('translate.html', translations=translations)
 
 @app.route('/categories')
 def categories():
-    return render_template('categories.html')
+    # Detect the user's preferred language from a cookie or default to 'en' (English)
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    
+    return render_template('categories.html', translations=translations)
 
 @app.route('/trending_phrases')
 def trending_phrases():
-    return render_template('trending_phrases.html')
+    # Detect the user's preferred language from a cookie or default to 'en' (English)
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    
+    return render_template('trending_phrases.html', translations=translations)
 
 @app.route('/lyrics')
 def lyrics():
-    return render_template('lyrics.html')
+    # Detect the user's preferred language from a cookie or default to 'en' (English)
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    
+    return render_template('lyrics.html', translations=translations)
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    # Detect the user's preferred language from a cookie or default to 'en' (English)
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    
+    return render_template('about.html', translations=translations)
 
 if __name__ == '__main__':
     app.run(debug=True)
-# if __name__ == '__main__':
-#     app.run(host='0.0.0.0', port=5000)

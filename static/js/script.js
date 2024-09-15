@@ -1,3 +1,7 @@
+document.getElementById('dark-mode-toggle').addEventListener('click', function () {
+    document.body.classList.toggle('dark_mode');
+});
+
 const container = document.getElementById('accountContainer');
 const registerBtn= document.getElementById('register');
 const loginBtn= document.getElementById('login');
@@ -11,12 +15,12 @@ loginBtn.addEventListener('click', ()=>{
 });
 
 
-const darkModeToggleCheckbox = document.getElementById('darkmode_toggle_checkbox');
+// const darkModeToggleCheckbox = document.getElementById('darkmode_toggle_checkbox');
 
-darkModeToggleCheckbox.addEventListener('change', () => {
-  if (darkModeToggleCheckbox.checked) {
-    document.body.classList.add('dark_mode');
-  } else {
-    document.body.classList.remove('dark_mode');
-  }
-});
+// darkModeToggleCheckbox.addEventListener('change', () => {
+//   if (darkModeToggleCheckbox.checked) {
+//     document.body.classList.add('dark_mode');
+//   } else {
+//     document.body.classList.remove('dark_mode');
+//   }
+// });
