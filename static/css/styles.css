@@ -48,6 +48,8 @@ header {
     padding: 10px 5px;
     transition: all 0.3s ease;
     font-size:20px;
+    display:flex;
+    align-items:center;
 /*    border: 1px solid hotpink;*/
 }
 
@@ -59,6 +61,12 @@ header {
     height: 40px;
     transition: all 0.3s ease;
 }
+
+.logo {
+    width: 50px;
+    height: auto;
+}
+
 
 
 nav ul {
@@ -416,6 +424,13 @@ nav ul li.active a {
     height: 40px;
 }
 
+.error-message {
+    color: red;
+    font-size: 14px;
+    margin-top: 10px;
+    text-align: center;
+}
+
 .toggle-container{
     position: absolute;
     top: 0;
@@ -534,16 +549,25 @@ p {
 .search_box {
     margin-top: 5px;
     display: flex;
+    width: 100%;
     align-items: center;
+    margin: 0 auto;
+    
 }
-.search_box .form{
-    background-color: #fff;
+
+.search_box div{
+     background-color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     padding: 0 40px;
     height: 100%;
+    width: 100%;
+}
+.search_box .form{
+   
 }
 
 .search_box input{
@@ -634,8 +658,8 @@ p {
 .card {
     background: var(--bg-color);
     border-radius: var(--border-radius);
-    padding: 20px;
-    width: 100%;
+    padding: 10px;
+    max-width: 240px;
     margin: 2%;
     flex: 1;
     box-sizing: border-box;
@@ -646,7 +670,7 @@ p {
     justify-content: space-between;
     transition: transform 0.3s ease;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    text-align: center;
+    text-align: left;
 }
 
 .card:hover {
@@ -671,7 +695,7 @@ p {
     margin-right: 0;
     font-size: 24px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     color: #000;
 }
 
@@ -699,7 +723,7 @@ p {
     color: var(--accent-color);
     border: none;
     border-radius: var(--border-radius);
-    padding: 10px 15px;
+    padding: 4px 2px;
     cursor: pointer;
     margin: 0 10px;
     transition: background-color 0.3s ease;

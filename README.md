@@ -2,6 +2,9 @@
 
 **ShengHome** is a platform dedicated to documenting and contributing to the Sheng language. It offers a variety of features for users to search, submit, and explore Sheng words, while providing administrative tools for content management.
 
+![Translate image](./static/images/Translate.png)
+
+
 ## Table of Contents
 
 - [Features](#features)
@@ -91,3 +94,8 @@ For detailed instructions, please refer to the [CONTRIBUTING.md](CONTRIBUTING.md
 ## License
 
 This project is licensed under the [MIT License](LICENSE). See the [LICENSE](LICENSE) file for details.
+
+![Login image](./static/images/Login.png)
+![Categories image](./static/images/Categories.png)
+![About image](./static/images/about.png)
+![Home image](./static/images/home.png)

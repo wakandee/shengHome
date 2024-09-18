@@ -11,9 +11,10 @@
 </head>
 <body>
     <header>
-        <nav class="top_nav">
-            ShengHome <img src="" alt="logo">
-        </nav>
+      <nav class="top_nav">
+    <img src="{{ url_for('static', filename='images/logo.jfif') }}" alt="logo" class="logo">ShengHome 
+</nav>
+
         <nav>
             <ul class="nav-links">
                 <li class="{% if request.endpoint == 'home' %}active{% endif %}"><a href="{{ url_for('home') }}" class="nav-item">{{ translations['home'] }}</a></li>
