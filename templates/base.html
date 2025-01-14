@@ -74,6 +74,19 @@
 
 
     <main>
+        <div class="flash-overlay-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-overlay {{ category }}">
+                        <button class="close-btn">&times;</button>
+                        {{ message }}
+                        <div class="progress-bar"></div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
         {% block content %}{% endblock %}
     </main>
 
