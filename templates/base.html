@@ -63,7 +63,8 @@
                 </li>
 
                 {% if 'username' in session %}
-                    <li><a href="{{ url_for('logout') }}" class="nav-item">{{ translations['logout'] }}</a></li>
+                <li><a href="{{ url_for('profile') }}" class="nav-item">{{ translations['profile'] }}</a></li>
+                    <!-- <li><a href="{{ url_for('logout') }}" class="nav-item">{{ translations['logout'] }}</a></li> -->
                 {% else %}
                     <li><a href="{{ url_for('login_register') }}" class="nav-item">{{ translations['login_register'] }}</a></li>
                 {% endif %}

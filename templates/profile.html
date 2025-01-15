@@ -1,10 +1,40 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<div class="neu-card">
-    <h2>Your Profile</h2>
-    <p>Name: Super Admin</p>
-    <p>Email: admin@example.com</p>
-    <!-- Add more profile details here -->
+<div class="container" id="profileContainer">
+    <div class="profile-header">
+        <!-- User Avatar -->
+        <div class="avatar-container">
+            
+        </div>
+
+        <!-- User Information -->
+        <h2>{{ session.fname }} {{ session.other_name }}</h2>
+        <p>{{ session.email }}</p>
+        <p>Status: <span class="status {{ session.status }}">{{ session.status.capitalize() }}</span></p>
+
+        <!-- Logout Button -->
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+            <i class="fa fa-power-off"></i> Logout
+        </a>
+    </div>
+
+    <div class="profile-body">
+        <!-- Change Password Form -->
+        <form action="{{ url_for('change_password') }}" method="POST" class="form">
+            <h3>Change Password</h3>
+            <input type="password" name="current_password" placeholder="Current Password" required>
+            <input type="password" name="new_password" placeholder="New Password" required>
+            <input type="password" name="confirm_password" placeholder="Confirm New Password" required>
+            <button type="submit">Update Password</button>
+        </form>
+
+        <!-- Upload Avatar Form -->
+        <form action="{{ url_for('upload_avatar') }}" method="POST" enctype="multipart/form-data" class="form">
+            <h3>Update Profile Picture</h3>
+            <input type="file" name="avatar" accept="image/*" required>
+            <button type="submit">Upload Avatar</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

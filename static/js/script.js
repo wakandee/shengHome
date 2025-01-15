@@ -42,3 +42,18 @@ darkModeToggleCheckbox.addEventListener('change', () => {
             });
         });
     });
+
+// scrip for profile page
+// Optional: Preview uploaded avatar
+    document.querySelector('.avatar-upload-input').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            document.querySelector('.avatar-img').src = e.target.result;
+        };
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    });

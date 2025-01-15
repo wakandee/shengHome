@@ -304,7 +304,7 @@ nav ul li.active a {
     overflow: hidden;
     width: 768px;
     max-width: 100%;
-    min-height: 480px;
+    min-height: 500px;
     margin-top: 6%;
     padding: 2%;
 }
@@ -1232,3 +1232,128 @@ p {
             }
         }
 /*END OF FLASH MESSAGES */
+
+
+/* start of profile syles */
+/* Profile Container */
+#profileContainer {
+    padding: 20px;
+    text-align: center;
+    border-radius: 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+    background-color: #fff;
+    max-width: 600px;
+    margin: 50px auto;
+}
+
+/* Avatar Styling */
+.avatar-container {
+    position: relative;
+    margin: 20px auto;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: 4px solid #007bff;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Profile Information */
+.profile-header h2 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.profile-header p {
+    font-size: 16px;
+    margin: 5px 0;
+}
+
+.status {
+    font-weight: bold;
+}
+
+.status.pending {
+    color: #ff9800;
+}
+
+.status.verified {
+    color: #4caf50;
+}
+
+.status.suspended {
+    color: #f44336;
+}
+
+/* Logout Button */
+.logout-btn {
+    display: inline-block;
+    margin-top: 20px;
+    background: linear-gradient(to right, #007bff, #80bfff);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: 0.3s ease;
+    text-decoration: none;
+}
+
+.logout-btn:hover {
+    background: linear-gradient(to right, #80bfff, #007bff);
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+}
+
+.logout-btn i {
+    margin-right: 8px;
+}
+
+/* Form Styling */
+.form {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.form input {
+    width: 90%;
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+}
+
+.form button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.form button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+}

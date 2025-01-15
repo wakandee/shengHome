@@ -7,21 +7,32 @@
             <h1>Create Account</h1>
             <div class="social-icons">
                 <a href="#" class="icon"><i class="fa-brands fa-google"></i></a>
-                <a href="#" class="icon"><i class="fa-brands fa-facebook"></i></a>
+                <!-- <a href="#" class="icon"><i class="fa-brands fa-facebook"></i></a>
                 <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
-                <a href="#" class="icon"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="#" class="icon"><i class="fa-brands fa-linkedin"></i></a> -->
             </div>
             <span>Or use your email for registration</span>
             {% if error_signup %}
                 <div class="error-message">{{ error_signup }}</div>
             {% endif %}
             <input type="hidden" name="form_type" value="register">
-            <input type="text" name="name" placeholder="Name" value="{{ name|default('') }}" required>
-            <input type="text" name="username" placeholder="User Name" value="{{ username|default('') }}" required>
+            <!-- First Name -->
+            <input type="text" name="fname" placeholder="First Name" value="{{ fname|default('') }}" minlength="2" required>
+
+            <!-- Other Name -->
+            <input type="text" name="other_name" placeholder="Other Name" value="{{ other_name|default('') }}" minlength="2" required>
+
+            <!-- Username -->
+            <input type="text" name="username" placeholder="User Name" value="{{ username|default('') }}" minlength="3" required>
+
+            <!-- Email -->
             <input type="email" name="email" placeholder="Email" value="{{ email|default('') }}" required>
 
-            <input type="password" id="signup_password" name="password" placeholder="Password" required>
-            <div id="signup_password_error" class="error-message" style="display: none;">Passwords do not match.</div>
+            <!-- Password -->
+            <input type="password" id="signup_password" name="password" placeholder="Password" minlength="4" required>
+
+            <div id="signup_password_error" class="error-message" style="display: none; size: 10px;">Passwords do not match.</div>
+
             <input type="password" id="signup_confirm_password" name="confirm_password" placeholder="Confirm Password" required>
             
 
