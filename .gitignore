@@ -1,0 +1,29 @@
+# Ignore Python bytecode files
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore environment variables file (never commit sensitive data)
+.env
+
+# Ignore virtual environment directories
+venv/
+env/
+
+# Ignore Flask migration folder (if using Flask-Migrate)
+migrations/
+
+# Ignore logs or temporary files
+*.log
+*.sqlite
+
+# Ignore IDE-specific files (if using VSCode or PyCharm)
+.vscode/
+.idea/
+
+# Ignore compiled files (if using Cython or other compilers)
+*.so
+*.cpython*
+
+# Ignore app-specific config files if you don't want them in version control
+config.py
