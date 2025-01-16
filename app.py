@@ -8,6 +8,9 @@ from flask_migrate import Migrate
 import json
 from sqlalchemy import inspect  # Import inspect
 import hashlib # for hashing password into Sha256
+from werkzeug.utils import secure_filename, os
+from datetime import datetime
+
 
 app = Flask(__name__)
 
@@ -25,14 +28,29 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:admin@local
 app.secret_key = 'your_secret_key'
 app.config.from_object(Config)
 
-print(app.config['SQLALCHEMY_DATABASE_URI'])
+# print(app.config['SQLALCHEMY_DATABASE_URI'])
 db.init_app(app)
 
-# Check if the table exists using the inspect method
+# Config.init_app(app)  # Initialize the app with the custom upload folder
+
+# Check and create if not exist the upload folder.
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
+# Check and create tables
 with app.app_context():
     inspector = inspect(db.engine)  # Create an inspector object
-    if 'users' not in inspector.get_table_names():  # Check if 'users' table exists
-        db.create_all()  # This will create the users table if it does not exist
+    
+    # List of tables to check
+    required_tables = ['users', 'avatars']
+    
+    existing_tables = inspector.get_table_names()  # Fetch existing tables
+    
+    # Check for missing tables and create them
+    for table in required_tables:
+        if table not in existing_tables:
+            print(f"Creating table: {table}")
+            db.create_all()  # This will create all missing tables defined in the models
 
 @app.route('/set_language/<lang>')
 def set_language(lang):
@@ -83,12 +101,16 @@ def login_register():
             
             if user and user.password == hashed_password:
                 # Store user details in the session
-                session['user_id'] = user.id
+                session['user_id'] = user.user_id
                 session['username'] = user.username
                 session['fname'] = user.fname
                 session['other_name'] = user.other_name
                 session['email'] = user.email
                 session['status'] = user.status
+
+                # Fetch and store the avatar URL in session
+                avatar = Avatar.query.filter_by(user_id=user.user_id).order_by(Avatar.uploaded_at.desc()).first()
+                session['avatar_url'] = avatar.avatar_url if avatar else url_for('static', filename='default/avatars/default-avatar.png')
                 return redirect(url_for('home'))
             else:
                 error_login = "Invalid credentials"
@@ -186,7 +208,12 @@ def about():
 def profile():
     language = request.cookies.get('language') or 'en'
     translations = load_language(language)
-    return render_template('profile.html', translations=translations)
+    
+    # Get the default avatar filename from  the config
+    default_avatar_filename = app.config['DEFAULT_AVATAR_FILENAME']
+    
+    # Pass the default avatar filename to the template
+    return render_template('profile.html', translations=translations, default_avatar_filename=default_avatar_filename)
 
 @app.route('/change_password', methods=['POST'])
 def change_password():
@@ -205,7 +232,7 @@ def change_password():
         return redirect(url_for('login'))
 
     # Fetch the user from the database
-    user = User.query.filter_by(id=user_id).first()
+    user = User.query.filter_by(user_id=user_id).first()
 
     if not user:
         flash('User not found!', 'error')
@@ -226,20 +253,59 @@ def change_password():
     flash('Password updated successfully!', 'success')
     return redirect(url_for('profile'))
 
+# Insert a new avatar into the database
+def insert_avatar(user_id, avatar_url):
+    """
+    Inserts a new avatar record for the given user.
 
+    :param user_id: ID of the user
+    :param avatar_url: URL or path to the avatar file
+    """
+    new_avatar = Avatar(user_id=user_id, avatar_url=avatar_url)  # Avoid shadowing
+    db.session.add(new_avatar)
+    db.session.commit()
+
+# Upload avatar endpoint
 @app.route('/upload_avatar', methods=['POST'])
 def upload_avatar():
-    avatar = request.files['avatar']
-    if avatar:
-        filename = secure_filename(avatar.filename)
-        avatar.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        
-        # Update user's avatar URL in DB
-        # ...
+    avatar = request.files.get('avatar')
+    user_id = session.get('user_id')  # Get user ID from the session
+    
+    if not avatar or not user_id:
+        flash('Avatar and user ID are required.', 'danger')
+        return redirect(url_for('profile'))
 
-        flash('Avatar updated successfully!', 'success')
+    # Secure the filename and rename it using user_id, username, and timestamp
+    filename = f"{user_id}_{session.get('username')}_{datetime.now().strftime('%Y%m%d%H%M%S')}.png"
+    # Save file to the UPLOAD_FOLDER
+    upload_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+     # Set the URL for the avatar (Flask will serve this from the static folder)
+    avatar_url = url_for('static', filename=f'uploads/avatars/{filename}')
+    
+    # Save the file to the server
+    try:
+        avatar.save(upload_path)
+    except Exception as e:
+        flash(f"Error uploading file: {str(e)}", 'danger')
+        return redirect(url_for('profile'))
+
+    # Insert avatar information into the database
+    try:
+        insert_avatar(user_id, avatar_url)
+        # Update session with new avatar URL
+        session['avatar_url'] = avatar_url
+        flash('Avatar uploaded successfully!', 'success')
+    except Exception as e:
+        flash(f"Error saving avatar in database: {str(e)}", 'danger')
+    
     return redirect(url_for('profile'))
 
+@app.route('/admin')
+def admin():
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    return render_template('admin.html', translations=translations)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)

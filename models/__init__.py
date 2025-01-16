@@ -5,5 +5,5 @@ db = SQLAlchemy()
 
 # Import the models (e.g., User)
 from .user import User
-from .user import Avatar
+from .Avatar import Avatar
 # from models.translation import Translation  # Add other models here if necessary

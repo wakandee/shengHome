@@ -22,27 +22,6 @@ darkModeToggleCheckbox.addEventListener('change', () => {
 });
 
 
-    // Flash message functionality
-    document.addEventListener("DOMContentLoaded", function () {
-        const flashMessages = document.querySelectorAll(".flash-overlay");
-
-        flashMessages.forEach((message) => {
-            const closeBtn = message.querySelector(".close-btn");
-
-            // Auto-dismiss after 3 seconds
-            setTimeout(() => {
-                message.style.opacity = "0";
-                setTimeout(() => message.remove(), 500);
-            }, 3000);
-
-            // Close button functionality
-            closeBtn.addEventListener("click", () => {
-                message.style.opacity = "0";
-                setTimeout(() => message.remove(), 500);
-            });
-        });
-    });
-
 // scrip for profile page
 // Optional: Preview uploaded avatar
     document.querySelector('.avatar-upload-input').addEventListener('change', function(event) {

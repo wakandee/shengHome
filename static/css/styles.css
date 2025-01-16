@@ -1177,7 +1177,8 @@ p {
         .flash-overlay {
             position: fixed;
             top: 20px;
-            right: 20px;
+/*            right: 20px;*/
+            margin: auto;
             z-index: 1000;
             max-width: 300px;
             background-color: rgba(255, 255, 255, 0.9);
@@ -1244,6 +1245,7 @@ p {
     background-color: #fff;
     max-width: 600px;
     margin: 50px auto;
+
 }
 
 /* Avatar Styling */
@@ -1255,7 +1257,7 @@ p {
     border-radius: 50%;
     overflow: hidden;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border: 4px solid #007bff;
+    border: 4px solid #007bff; /* Thin border for the container */
 }
 
 .avatar {
@@ -1263,6 +1265,9 @@ p {
     height: 100%;
     object-fit: cover;
     display: block;
+    border-radius: 50%;
+    border: 3px solid white; /* Add a thin inner border around the image */
+    box-sizing: border-box; /* Ensures border is part of the image dimensions */
 }
 
 /* Profile Information */
@@ -1320,15 +1325,17 @@ p {
 /* Form Styling */
 .form {
     margin: 20px 0;
-    padding: 15px;
+    padding: 20px;
     background: #f9f9f9;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+/*    border: 1px solid hotpink;*/
 }
 
 .form h3 {
     font-size: 18px;
-    margin-bottom: 15px;
+    margin: 10px 0;
 }
 
 .form input {
@@ -1351,6 +1358,7 @@ p {
     font-size: 14px;
     cursor: pointer;
     transition: 0.3s ease;
+    margin-bottom: 10px;
 }
 
 .form button:hover {

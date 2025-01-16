@@ -3,9 +3,9 @@
 {% block content %}
 <div class="container" id="profileContainer">
     <div class="profile-header">
-        <!-- User Avatar -->
+       <!-- User Avatar -->
         <div class="avatar-container">
-            
+            <img src="{{ session.get('avatar_url') or url_for('static', filename='default/avatars/' + default_avatar) }}" alt="Avatar" class="avatar">
         </div>
 
         <!-- User Information -->
@@ -20,6 +20,14 @@
     </div>
 
     <div class="profile-body">
+        <!-- Upload Avatar Form -->
+        <form action="{{ url_for('upload_avatar') }}" method="POST" enctype="multipart/form-data" class="form">
+            <h3>Update Profile Picture</h3>
+            <input type="file" name="avatar" accept="image/*" required>
+            <button type="submit">Upload Avatar</button>
+        </form>
+
+        
         <!-- Change Password Form -->
         <form action="{{ url_for('change_password') }}" method="POST" class="form">
             <h3>Change Password</h3>
@@ -29,12 +37,7 @@
             <button type="submit">Update Password</button>
         </form>
 
-        <!-- Upload Avatar Form -->
-        <form action="{{ url_for('upload_avatar') }}" method="POST" enctype="multipart/form-data" class="form">
-            <h3>Update Profile Picture</h3>
-            <input type="file" name="avatar" accept="image/*" required>
-            <button type="submit">Upload Avatar</button>
-        </form>
+        
     </div>
 </div>
 {% endblock %}

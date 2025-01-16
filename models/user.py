@@ -1,10 +1,10 @@
 from . import db
-
 from sqlalchemy import Enum  # Add this import at the top of your file
+from sqlalchemy.sql import func
 
 class User(db.Model):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, primary_key=True)
     # First name and other name
     fname = db.Column(db.String(100), nullable=False)  # First name
     other_name = db.Column(db.String(100), nullable=False)  # Other name (replaces lname)
@@ -19,13 +19,5 @@ class User(db.Model):
     email = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
 
-
-class Avatar(db.Model):
-    __tablename__ = 'avatars'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
-    avatar_url = db.Column(db.String(255), nullable=False)  # URL or file path to the avatar image
-    uploaded_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
-
-    # Relationship with the User model
-    user = db.relationship('User', backref=db.backref('avatar', uselist=False, cascade="all, delete-orphan"))
+    # New column to capture date created
+    date_created = db.Column(db.DateTime(timezone=True), default=func.now(), nullable=False)
