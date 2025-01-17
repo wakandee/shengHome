@@ -10,14 +10,24 @@
 
         <!-- User Information -->
         <h2>{{ session.fname }} {{ session.other_name }}</h2>
-        <p>{{ session.email }}</p>
+        <p>
+            {{ session.email }}
+            {% if session.is_verified %}
+                <i class="fa fa-check-circle verified_icon" aria-hidden="true"></i>
+            {% else %}
+                <a href="{{ url_for('email_verification') }}" class="verify-link">Verify Email</a>
+            {% endif %}
+        </p>
+        <p>Username: <span class="status {{ session.username }}">{{ session.username.capitalize() }}</span></p>
         <p>Status: <span class="status {{ session.status }}">{{ session.status.capitalize() }}</span></p>
+
 
         <!-- Logout Button -->
         <a href="{{ url_for('logout') }}" class="logout-btn">
             <i class="fa fa-power-off"></i> Logout
         </a>
     </div>
+    <br><hr><br>
 
     <div class="profile-body">
         <!-- Upload Avatar Form -->
@@ -26,7 +36,8 @@
             <input type="file" name="avatar" accept="image/*" required>
             <button type="submit">Upload Avatar</button>
         </form>
-
+        
+        <br><hr><br>
         
         <!-- Change Password Form -->
         <form action="{{ url_for('change_password') }}" method="POST" class="form">

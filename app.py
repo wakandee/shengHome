@@ -1,15 +1,29 @@
 from flask import Flask, render_template, request, redirect, url_for, session, make_response, flash
 from config import Config
 from models import db
-from models import User
-from models import Avatar
+from models import User  # Make sure you import the User model
+from models import Avatar, UserVerification
 from utils.db_helper import check_and_create_db
 from flask_migrate import Migrate
 import json
+import datetime
 from sqlalchemy import inspect  # Import inspect
 import hashlib # for hashing password into Sha256
 from werkzeug.utils import secure_filename, os
-from datetime import datetime
+from datetime import datetime, timedelta
+import random
+
+from flask import request, jsonify, url_for
+
+
+from flask_mail import Mail
+from dotenv import load_dotenv  # Load environment variables from .env file
+
+# Load environment variables from .env file
+load_dotenv()
+
+from utils import send_email  # Import the send_email function from utils.py
+from config import Config  # Import configuration settings  
 
 
 app = Flask(__name__)
@@ -30,6 +44,11 @@ app.config.from_object(Config)
 
 # print(app.config['SQLALCHEMY_DATABASE_URI'])
 db.init_app(app)
+migrate = Migrate(app, db)
+
+# Initialize Flask-Mail
+mail = Mail(app)
+
 
 # Config.init_app(app)  # Initialize the app with the custom upload folder
 
@@ -42,7 +61,7 @@ with app.app_context():
     inspector = inspect(db.engine)  # Create an inspector object
     
     # List of tables to check
-    required_tables = ['users', 'avatars']
+    required_tables = ['users', 'avatars', 'user_verifications']
     
     existing_tables = inspector.get_table_names()  # Fetch existing tables
     
@@ -79,7 +98,11 @@ def home():
     # Render the HTML template with translations passed to it
     return render_template('home.html', translations=translations)
 
-from models import User  # Make sure you import the User model
+# Route to send email directly
+@app.route('/send_email')
+def send_email_route():
+    send_email(app, 'Hello from Flask', 'allanwakande@gmail.com', 'This is a test email sent from Flask.')
+    return 'Email sent!'
 
 @app.route('/login_register', methods=['GET', 'POST'])
 def login_register():
@@ -107,6 +130,7 @@ def login_register():
                 session['other_name'] = user.other_name
                 session['email'] = user.email
                 session['status'] = user.status
+                session['is_verified'] = user.is_verified
 
                 # Fetch and store the avatar URL in session
                 avatar = Avatar.query.filter_by(user_id=user.user_id).order_by(Avatar.uploaded_at.desc()).first()
@@ -150,15 +174,103 @@ def login_register():
                                        username=username, email=email)
             else:
                 # Successful registration
+
+                 # Generate a verification code and expiry time
+                verification_code = str(random.randint(100000, 999999))
+                # expiry_time = datetime.datetime.utcnow() + datetime.timedelta(minutes=10)  # 10 minutes expiry
+                expiry_time = datetime.utcnow() + timedelta(minutes=10)
+
                 new_user = User(username=username, email=email, password=hashed_password, fname=fname, other_name=other_name)
                 db.session.add(new_user)
                 db.session.commit()
-                session['username'] = username
-                flash("Registration successful! Please log in.", "success")
-                return redirect(url_for('login_register'))   
+
+                # Store the verification code in the database
+                verification_record = UserVerification(user_id=new_user.user_id, code=verification_code, expiry_time=expiry_time)
+                db.session.add(verification_record)
+                db.session.commit()
+
+                # Send the email with the verification code
+                verification_link = url_for('verify_email', code=verification_code, _external=True)
+                email_body = f'Hi {fname},\n\nPlease use the following code to verify your email address\n\n CODE: {verification_code}\n\n\n\n\nVerification link: {verification_link}\n\nThe code will expire in 10 minutes.'
+                send_email(app, 'Email Verification', email, email_body)
+
+                # session['email'] = user.email
+                session['user_id'] = new_user.user_id
+
+                flash("Registration successful! Please check your email to verify your account.", "success")
+                # return render_template('email_verification.html', translations=translations)
+                return redirect(url_for('email_verification'))  # Redirect to the verification page  
     
     return render_template('login_register.html', translations=translations)
 
+
+@app.route('/verify_email', methods=['POST'])
+def verify_email():
+    verification_code = request.form.get('verificationCode')
+    user_id = session.get('user_id')
+
+    # Fetch the verification record
+    verification_record = UserVerification.query.filter_by(
+        user_id=user_id, code=verification_code
+    ).first()
+
+    # if verification_record and verification_record.expiry_time > datetime.datetime.utcnow():
+    if verification_record and verification_record.expiry_time > datetime.utcnow():
+        # Mark user as verified and update the status
+        user = User.query.get(user_id)
+        user.is_verified = True
+        user.status = 'active'  # Update the status to 'active'
+        db.session.commit()
+
+        # Fetch updated user data and update session variables
+        session['is_verified'] = user.is_verified
+        session['status'] = user.status
+        session['username'] = user.username
+        session['email'] = user.email
+
+        flash("Email verified successfully!", "success")
+        return redirect(url_for('profile'))
+    else:
+        flash("Invalid or expired verification code.", "danger")
+        return redirect(url_for('verify_email'))
+
+
+@app.route('/email_verification')
+def email_verification():
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    return render_template('email_verification.html', translations=translations)
+
+
+@app.route('/resend_verification_code', methods=['POST'])
+def resend_verification_code():
+    data = request.get_json()
+    email = data.get('email')
+    user = User.query.filter_by(email=email).first()
+
+    if user:
+        verification_code = str(random.randint(100000, 999999))
+        expiry_time = datetime.utcnow() + timedelta(minutes=10)
+
+        # Update or create the verification record
+        verification_record = UserVerification.query.filter_by(user_id=user.user_id).first()
+        if verification_record:
+            verification_record.code = verification_code
+            verification_record.expiry_time = expiry_time
+        else:
+            verification_record = UserVerification(
+                user_id=user.user_id, code=verification_code, expiry_time=expiry_time
+            )
+            db.session.add(verification_record)
+        db.session.commit()
+
+        # Send email
+        email_body = f"Hi {user.fname},\n\nYour new verification code is: {verification_code}\nIt will expire in 10 minutes."
+        send_email(app, "Resend Verification Code", email, email_body)
+
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'message': 'User not found'}), 404
 
 
 @app.route('/logout')
@@ -275,6 +387,7 @@ def upload_avatar():
         flash('Avatar and user ID are required.', 'danger')
         return redirect(url_for('profile'))
 
+    # print(datetime)
     # Secure the filename and rename it using user_id, username, and timestamp
     filename = f"{user_id}_{session.get('username')}_{datetime.now().strftime('%Y%m%d%H%M%S')}.png"
     # Save file to the UPLOAD_FOLDER

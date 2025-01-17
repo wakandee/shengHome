@@ -691,6 +691,21 @@ p {
     transform: translate(50%, -50%);
 }
 
+/* Verification Link Styling */
+.verify-link {
+    margin-left: 8px;
+    font-size: 0.9em;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease-in-out;
+}
+
+.verify-link:hover {
+    color: #0056b3; /* Darker blue on hover */
+    text-decoration: underline;
+}
+
 .sheng_word {
     margin-right: 0;
     font-size: 24px;

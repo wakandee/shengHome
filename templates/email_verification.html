@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container" id="verificationContainer">
+    {% if not session.get('email') or not session.get('user_id') %}
+    <div class="overlay">
+        <h3>Email not set. <br><br>Please log in first.</h1>
+    </div>
+
+    <style type="text/css">
+        .verified_message_container, .verification_form_container{
+            opacity: 50%;
+            filter: blur(3px);
+
+        }
+    </style>
+    {% endif %}
+
+    {% if session.get('is_verified') %}
+    <div class="verified_message_container">
+        <h1>Email Verified</h1>
+        <p>
+            <strong>Email:</strong> {{ session.get('email') }} <span style="color: green;">✔</span>
+        </p>
+        <p>Your email has been successfully verified.</p>
+    </div>
+    {% else %}
+    <div class="verification_form_container">
+        <h1>Email Verification</h1>
+        <p class="verification_message">
+            Please verify your email by entering the verification code sent to your email address. If you didn't
+            receive the code, you can request a new one.
+        </p>
+
+        <!-- Display the user's email -->
+        <p class="verification-user-email">
+            <strong>Email:</strong> {{ session.get('email') }}
+        </p>
+
+        <form id="verificationForm" method="POST" action="{{ url_for('verify_email') }}">
+            <div class="resend_section">
+                <input
+                    type="text"
+                    id="verificationCode"
+                    name="verificationCode"
+                    placeholder="Enter verification code"
+                    required
+                />
+                <button type="button" class="btn_resend_code" id="resendButton" onclick="resendCode()" disabled>
+                    <span id="resendButtonText">Resend Code</span>
+                    <div id="spinner" class="spinner-border spinner-border-sm" style="display: none; color: white;"></div>
+                </button>
+            </div>
+            <div class="action_section">
+                <button type="submit" class="btn_verify" id="verifyButton">
+                    Verify
+                </button>
+            </div>
+        </form>
+
+        <span id="countdown"></span>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 40px;
+        position: relative;
+    }
+
+    .verification_form_container, .verified_message_container {
+        width: 100%;
+        max-width: 420px;
+        background-color: #f5f5f5;
+        padding: 10px 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .verified_message_container h1 {
+        text-align: center;
+        font-size: 2em;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        color: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        z-index: 10;
+        padding: 20px;
+        font-size: 20px;
+        border-radius: 12px;
+    }
+</style>
+
+<script>
+    const countdownStart = 60; // Countdown starts from 60 seconds
+    let countdownValue = countdownStart;
+    let countdownTimer;
+    const email = "{{ session.get('email') }}";
+
+    function initializeCountdown() {
+        const storedCountdown = sessionStorage.getItem("countdownValue");
+        const isCountdownActive = sessionStorage.getItem("isCountdownActive");
+
+        if (isCountdownActive === "true" && storedCountdown) {
+            countdownValue = parseInt(storedCountdown);
+            startCountdown();
+        } else {
+            enableResendButton();
+        }
+    }
+
+    function resendCode() {
+        disableResendButton();
+        showSpinner();
+
+        fetch("/resend_verification_code", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    alert("A new verification code has been sent to: " + email);
+                    sessionStorage.setItem("isCountdownActive", "true");
+                    countdownValue = countdownStart;
+                    startCountdown();
+                } else {
+                    alert("Failed to send verification code. Please try again.");
+                    enableResendButton();
+                }
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                alert("An error occurred. Please try again later.");
+                enableResendButton();
+            })
+            .finally(() => hideSpinner());
+    }
+
+    function startCountdown() {
+        sessionStorage.setItem("countdownValue", countdownValue);
+        countdownTimer = setInterval(() => {
+            countdownValue--;
+            sessionStorage.setItem("countdownValue", countdownValue);
+
+            if (countdownValue <= 0) {
+                clearInterval(countdownTimer);
+                enableResendButton();
+                sessionStorage.setItem("isCountdownActive", "false");
+            } else {
+                updateCountdownText();
+            }
+        }, 1000);
+
+        updateCountdownText();
+    }
+
+    function updateCountdownText() {
+        const resendButtonText = document.getElementById("resendButtonText");
+        resendButtonText.innerText =
+            countdownValue > 0
+                ? `Resend in ${countdownValue}s`
+                : "Resend Code";
+    }
+
+    function enableResendButton() {
+        const resendButton = document.getElementById("resendButton");
+        resendButton.disabled = false;
+        resendButton.classList.remove("btn_resend_code-disabled");
+        resendButton.classList.add("btn_resend_code");
+        document.getElementById("resendButtonText").innerText = "Resend Code";
+    }
+
+    function disableResendButton() {
+        const resendButton = document.getElementById("resendButton");
+        resendButton.disabled = true;
+        resendButton.classList.remove("btn_resend_code");
+        resendButton.classList.add("btn_resend_code-disabled");
+    }
+
+    function showSpinner() {
+        document.getElementById("spinner").style.display = "inline-block";
+    }
+
+    function hideSpinner() {
+        document.getElementById("spinner").style.display = "none";
+    }
+
+    initializeCountdown();
+</script>
+
+<style>
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 40px;
+    }
+
+    .verification_form_container {
+        width: 100%;
+        max-width: 420px;
+        background-color: #f5f5f5;
+        padding: 10px 30px;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .verification_form_container h1 {
+        text-align: center;
+        font-size: 2em;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .verification_message {
+        font-size: 1.1em;
+        color: #777;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+
+    .verification-user-email {
+        text-align: center;
+        font-size: 1.2em;
+        margin: 15px 0;
+        color: #333;
+    }
+
+    .resend_section {
+        display: flex;
+        align-items: center;
+    }
+
+    .resend_section input {
+        flex: 6;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-right: 10px;
+    }
+
+    .resend_section .btn_resend_code {
+/*        background-color: #6c757d;*/
+flex: 4;
+        color: white;
+        border: none;
+        padding: 6px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        cursor: pointer;
+        margin: auto;
+    }
+
+    .resend_section .btn_resend_code-disabled {
+        background-color: #b0b0b0;
+        color: #e6e6e6;
+        cursor: not-allowed;
+    }
+
+    .spinner-border {
+        margin-left: 5px;
+    }
+
+    .action_section{
+/*        border: 1px solid hotpink;*/
+        width: 100%;
+    }
+
+    .action_section .btn_verify {
+        background-color: #6c757d;
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        font-size: 0.9rem;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 100%;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

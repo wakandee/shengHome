@@ -11,12 +11,13 @@ class User(db.Model):
 
     # Updated Enum for status
     status = db.Column(
-        Enum('pending', 'verified', 'suspended', name='status_enum'),
+        Enum('pending', 'active', 'suspended', name='status_enum'),
         nullable=False,
         default='pending'
     )
     username = db.Column(db.String(100), unique=True, nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
+    is_verified = db.Column(db.Boolean, default=False)  # Add this column
     password = db.Column(db.String(255), nullable=False)
 
     # New column to capture date created
