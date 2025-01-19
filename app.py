@@ -1,30 +1,25 @@
 from flask import Flask, render_template, request, redirect, url_for, session, make_response, flash
-from config import Config
-from models import db
-from models import User  # Make sure you import the User model
-from models import Avatar, UserVerification
+from config import Config # Import configuration settings
+from models import db, User, Avatar, UserVerification, Categories, synonyms, word_votes, words
 from utils.db_helper import check_and_create_db
 from flask_migrate import Migrate
-import json
 import datetime
 from sqlalchemy import inspect  # Import inspect
 import hashlib # for hashing password into Sha256
 from werkzeug.utils import secure_filename, os
 from datetime import datetime, timedelta
-import random
+import random, json
 
-from flask import request, jsonify, url_for
+from flask import jsonify
 
 
 from flask_mail import Mail
 from dotenv import load_dotenv  # Load environment variables from .env file
+from utils import send_email  # Import the send_email function from utils.py 
+from models import Categories 
 
 # Load environment variables from .env file
 load_dotenv()
-
-from utils import send_email  # Import the send_email function from utils.py
-from config import Config  # Import configuration settings  
-
 
 app = Flask(__name__)
 
@@ -61,7 +56,7 @@ with app.app_context():
     inspector = inspect(db.engine)  # Create an inspector object
     
     # List of tables to check
-    required_tables = ['users', 'avatars', 'user_verifications']
+    required_tables = ['users', 'avatars', 'user_verifications', 'word_votes', 'synonyms', 'words', 'categories']
     
     existing_tables = inspector.get_table_names()  # Fetch existing tables
     
@@ -280,23 +275,113 @@ def logout():
 
 @app.route('/translate', methods=['GET', 'POST'])
 def translate():
-    if request.method == 'POST':
-        sheng_word = request.form['sheng_word']
-        translated_word = "Example Translation"  # Replace with actual translation
-        language = request.cookies.get('language') or 'en'
-        translations = load_language(language)
-        return render_template('translate.html', translated_word=translated_word, translations=translations)
+    from models import words  # Import your `words` model if not already done
     
+    # Default behavior to fetch all words
     language = request.cookies.get('language') or 'en'
     translations = load_language(language)
     
-    return render_template('translate.html', translations=translations)
+    if request.method == 'POST':
+        sheng_word = request.form['sheng_word'].strip()  # Remove extra spaces
+        
+        if sheng_word:  # If search text is provided, filter words
+            filtered_words = words.query.filter(words.word.ilike(f"%{sheng_word}%")).all()
+        else:  # If no search text, fetch all words
+            filtered_words = words.query.all()
+        
+        return render_template(
+            'translate.html',
+            translations=translations,
+            words=filtered_words
+        )
+    
+    # Fetch all words for the initial GET request
+    all_words = words.query.all()
+    return render_template(
+        'translate.html',
+        translations=translations,
+        words=all_words
+    )
+
+
+@app.route('/add_word', methods=['GET', 'POST'])
+def add_word():
+    if request.method == 'POST':
+        word = request.form['word']
+        translation = request.form['translation']
+        example = request.form['example']
+        category_id = request.form['category']
+        credits = request.form['credits']
+        user_id = session.get('user_id')  # Assuming user_id is stored in the session
+
+        # Create a new word entry
+        new_word = words(
+            word=word,
+            translation=translation,
+            example=example,
+            category_id=category_id,
+            credits=credits,
+            created_by=user_id,
+        )
+        db.session.add(new_word)
+        db.session.commit()
+        return redirect(url_for('translate'))
+
+    # Use a different name for the variable to avoid conflict with the model name
+    all_categories = Categories.query.all()  # Preload all categories
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    return render_template('add_word.html', translations=translations, categories=all_categories)
+
+
+
+# @app.route('/categories')
+# def categories():
+#     language = request.cookies.get('language') or 'en'
+#     translations = load_language(language)
+#     return render_template('categories.html', translations=translations)
 
 @app.route('/categories')
 def categories():
     language = request.cookies.get('language') or 'en'
     translations = load_language(language)
-    return render_template('categories.html', translations=translations)
+    all_categories = Categories.query.all()
+    return render_template('categories.html',translations=translations, categories=all_categories)
+
+@app.route('/add_category', methods=['GET', 'POST'])
+def add_category():
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    
+    if request.method == 'POST':
+        category_name = request.form.get('category_name')
+        category_description = request.form.get('category_description')
+        is_special = 'is_special' in request.form  # Checkbox for special category
+        created_by = session.get('user_id')  # Fetch user_id from session
+        
+        if category_name:
+            new_category = Categories(
+                name=category_name,
+                description=category_description,
+                is_special=is_special,
+                created_by=created_by
+            )
+            db.session.add(new_category)
+            db.session.commit()
+            flash('Category added successfully!', 'success')
+            return redirect(url_for('categories'))
+        else:
+            flash('Category name is required!', 'error')
+    
+    return render_template('add_category.html', translations=translations)
+
+
+@app.route('/category/<int:category_id>')
+def view_category(category_id):
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    category = categories.query.get_or_404(category_id)
+    return render_template('words.html', translations=translations, category=category, words=category.words)
 
 @app.route('/trending_phrases')
 def trending_phrases():
@@ -309,6 +394,12 @@ def lyrics():
     language = request.cookies.get('language') or 'en'
     translations = load_language(language)
     return render_template('lyrics.html', translations=translations)
+
+@app.route('/statistics')
+def statistics():
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    return render_template('statistics.html', translations=translations)
 
 @app.route('/about')
 def about():

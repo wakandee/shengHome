@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="category_add_container">
+    <h2 class="category_add_header">{{ translations['add_category'] }}</h2>
+    <form action="{{ url_for('add_category') }}" method="POST" class="category_add_form">
+        <div class="category_add_form_group">
+            <label for="category_name" class="category_add_label">{{ translations['category_name'] }}:</label>
+            <input type="text" id="category_name" name="category_name" class="category_add_input" placeholder="{{ translations['enter_category_name'] }}" required>
+        </div>
+        <div class="category_add_form_group">
+            <label for="category_description" class="category_add_label">{{ translations['category_description'] }}:</label>
+            <textarea id="category_description" name="category_description" class="category_add_textarea" placeholder="{{ translations['enter_category_description'] }}" required></textarea>
+        </div>
+         <div class="category_add_form_group">
+            <label for="is_special">{{ translations['is_special_category'] }}</label>
+            <input type="checkbox" id="is_special" name="is_special" class="">
+        </div>
+        <button type="submit" class="category_add_button">{{ translations['add_category'] }}</button>
+    </form>
+</div>
+{% endblock %}

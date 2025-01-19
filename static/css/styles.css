@@ -637,11 +637,16 @@ p {
 /*    border:  1px solid hotpink;*/
 }
 
+.title{
+    width: 100%;
+    margin: auto;
+}
+
 .title h2 {
-    font-size: 28px;
+    font-size: 22px;
     font-weight: bold;
     color: #333;
-    margin-bottom: 20px;
+    margin-bottom: 1%;
     text-align: center;
     width: 100%;
 }
@@ -972,14 +977,8 @@ p {
 
 
 
-
-
-
-
-
-
-/*categories styles */
-.categories {
+/* Categories container */
+.categories_container {
     background-color: rgba(255, 255, 255, 0.8);
     border-radius: 30px;
     padding: 20px;
@@ -989,55 +988,82 @@ p {
     backdrop-filter: blur(10px);
 }
 
-.categories h2 {
+.categories_header {
     font-size: 28px;
     text-align: center;
     color: #333;
     margin-bottom: 20px;
 }
 
-.categories p {
+.categories_description {
     font-size: 16px;
     text-align: center;
     color: #555;
     margin-bottom: 30px;
 }
 
-.category {
-    background-color: #f5f5f5;
+.add_category_button {
+    display: inline-block;
+    background: rgba(0, 123, 255, 0.1);
     border-radius: 20px;
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.5);
+    padding: 10px 20px;
+    color: #007bff;
+    font-size: 16px;
+    font-weight: bold;
     margin-bottom: 30px;
-    padding: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    animation: fadeIn 1s ease-in-out;
+    text-align: center;
+    text-decoration: none;
+    box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.1), inset -2px -2px 5px rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
 }
 
-.category:hover {
+.add_category_button:hover {
+    background: rgba(0, 123, 255, 0.2);
+    color: #0056b3;
+}
+
+/* Individual category card */
+.category_card {
+    background: linear-gradient(145deg, #f0f0f0, #ffffff);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2), -5px -5px 15px rgba(255, 255, 255, 0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fade_in 1s ease-in-out;
+}
+
+.category_card:hover {
     transform: translateY(-10px);
     box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.3), -5px -5px 20px rgba(255, 255, 255, 0.6);
 }
 
-.category h3 {
+.category_title {
     font-size: 22px;
     color: #007bff;
     margin-bottom: 10px;
 }
 
-.category ul {
+.category_description {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.category_word_list {
     list-style-type: none;
     padding-left: 0;
 }
 
-.category ul li {
+.category_word_item {
     font-size: 16px;
     color: #333;
-    padding-left: 15px;
+    padding-left: 20px;
     position: relative;
     margin-bottom: 8px;
 }
 
-.category ul li:before {
+.category_word_item::before {
     content: "•";
     color: #007bff;
     position: absolute;
@@ -1045,30 +1071,29 @@ p {
     font-size: 18px;
 }
 
-.view-more {
+/* View more button */
+.view_more_button {
     display: inline-block;
     background: linear-gradient(145deg, #e0e0e0, #ffffff);
-    border-radius: 30px;
-    padding: 10px 25px;
-    color: #007bff; /* Changed to a visible color */
+    border-radius: 20px;
+    padding: 8px 15px;
+    color: #007bff;
     font-size: 14px;
     font-weight: bold;
-    margin-top: 10px;
     border: none;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.5);
     cursor: pointer;
-    transition: background 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
 }
 
-.view-more:hover {
+.view_more_button:hover {
     background: linear-gradient(145deg, #ffffff, #e0e0e0);
-    color: #0056b3; /* Darker color on hover for better visibility */
-    box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.3), -5px -5px 20px rgba(255, 255, 255, 0.6);
+    color: #0056b3;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3), -5px -5px 15px rgba(255, 255, 255, 0.6);
 }
-
 
 /* Animations */
-@keyframes fadeIn {
+@keyframes fade_in {
     0% {
         opacity: 0;
         transform: translateY(20px);
@@ -1078,7 +1103,84 @@ p {
         transform: translateY(0);
     }
 }
-/*end of categories styles*/
+
+
+/* Add Category Container */
+.category_add_container {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 30px;
+    padding: 30px;
+    max-width: 600px;
+    margin: 5% auto;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.category_add_header {
+    font-size: 26px;
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.category_add_form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.category_add_form_group {
+    display: flex;
+    flex-direction: column;
+}
+
+.category_add_label {
+    font-size: 16px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.category_add_input, .category_add_textarea {
+    border: none;
+    border-radius: 20px;
+    padding: 10px 15px;
+    font-size: 16px;
+    box-shadow: inset 3px 3px 6px rgba(0, 0, 0, 0.2), inset -3px -3px 6px rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.category_add_input:focus, .category_add_textarea:focus {
+    outline: none;
+    box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.2), inset -5px -5px 10px rgba(255, 255, 255, 0.6);
+}
+
+.category_add_textarea {
+    resize: none;
+    height: 100px;
+}
+
+.category_add_button {
+    align-self: center;
+    background: linear-gradient(145deg, #e0e0e0, #ffffff);
+    border-radius: 30px;
+    padding: 10px 25px;
+    color: #007bff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.category_add_button:hover {
+    background: linear-gradient(145deg, #ffffff, #e0e0e0);
+    color: #0056b3;
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.3), -5px -5px 15px rgba(255, 255, 255, 0.6);
+}
+
+
+
 
 
 
@@ -1379,4 +1481,87 @@ p {
 .form button:hover {
     background-color: #0056b3;
     box-shadow: 0 4px 10px rgba(0, 123, 255, 0.4);
+}
+
+
+
+/* General Container Styling */
+.add_word_container {
+    max-width: 700px; /* Wider form container */
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Styling */
+.add_word_header {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* Form Styling */
+.add_word_form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Label Styling */
+.add_word_label {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+/* Input Fields Styling */
+.add_word_input,
+.add_word_textarea,
+.add_word_select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
+.add_word_input:focus,
+.add_word_textarea:focus,
+.add_word_select:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.25);
+}
+
+/* Textarea Styling */
+.add_word_textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Submit Button Styling */
+.add_word_button {
+    display: inline-block;
+    padding: 12px 20px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.add_word_button:hover {
+    background-color: #0056b3;
 }

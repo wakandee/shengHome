@@ -1,69 +1,27 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="categories">
-    <h2>Categories</h2>
-    <p>Select a category to explore Sheng words and their translations:</p>
+<div class="categories_container">
+    <h2 class="categories_header">Categories</h2>
+    <p class="categories_description">Select a category to explore Sheng words and their translations:</p>
 
-    <div class="category">
-        <h3><a href="#">Nouns</a></h3>
-        <p>Nouns represent people, places, or things. Sheng nouns evolve from English, Kiswahili, and local languages.</p>
-        <ul>
-            <li><strong>Msee</strong> – Person</li>
-            <li><strong>Keja</strong> – House</li>
-        </ul>
-        <button class="view-more">View More</button>
-    </div>
+    <a href="{{ url_for('add_category') }}" class="add_category_button">Add New Category</a>
 
-    <div class="category">
-        <h3><a href="#">Verbs</a></h3>
-        <p>Verbs describe actions, often mixing English and Kiswahili with Sheng flair.</p>
-        <ul>
-            <li><strong>Kusota</strong> – To suffer or struggle</li>
-            <li><strong>Chillax</strong> – To relax</li>
-        </ul>
-        <button class="view-more">View More</button>
-    </div>
-
-    <div class="category">
-        <h3><a href="#">Adverbs</a></h3>
-        <p>Adverbs modify verbs and provide more context to actions in Sheng sentences.</p>
-        <ul>
-            <li><strong>Haraka</strong> – Quickly</li>
-            <li><strong>Mbaya</strong> – Badly</li>
-        </ul>
-        <button class="view-more">View More</button>
-    </div>
-
-    <div class="category">
-        <h3><a href="#">Adjectives</a></h3>
-        <p>Adjectives describe qualities of nouns, often adding a playful Sheng twist to regular words.</p>
-        <ul>
-            <li><strong>Mafresh</strong> – Cool or stylish</li>
-            <li><strong>Mbichi</strong> – Raw or unpolished</li>
-        </ul>
-        <button class="view-more">View More</button>
-    </div>
-
-    <h3>Special Categories</h3>
-    <div class="category">
-        <h3><a href="#">Shembeteng</a></h3>
-        <p>Shembeteng is a playful twist of Sheng, altering words by inserting extra syllables.</p>
-        <ul>
-            <li><strong>Seve</strong> – Love</li>
-            <li><strong>Keteng</strong> – Ken</li>
-        </ul>
-        <button class="view-more">Explore More</button>
-    </div>
-
-    <div class="category">
-        <h3><a href="#">Conflicting Words</a></h3>
-        <p>These are Sheng words that carry different meanings depending on context.</p>
-        <ul>
-            <li><strong>Nganya</strong> – Can mean either a "matatu" or a "crazy person"</li>
-            <li><strong>Chapaa</strong> – Can mean "money" or "to print something"</li>
-        </ul>
-        <button class="view-more">View More</button>
-    </div>
+    {% for category in categories %}
+        <div class="category_card">
+            <h3 class="category_title">
+                <a href="{{ url_for('view_category', category_id=category.id) }}">{{ category.name }}</a>
+            </h3>
+            <p class="category_description">{{ category.description }}</p>
+            <ul class="category_word_list">
+                {% for word in category.words[:2] %} {# Show up to 2 words for preview #}
+                    <li class="category_word_item">
+                        <strong>{{ word.word }}</strong> – {{ word.translation }}
+                    </li>
+                {% endfor %}
+            </ul>
+            <button class="view_more_button">View More</button>
+        </div>
+    {% endfor %}
 </div>
 {% endblock %}

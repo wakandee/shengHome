@@ -14,5 +14,10 @@
     "sheng": "Sheng",
     "profile":"profile",
     "welcome": "Welcome to Sheng Translator",
-    "admin": "Admin"
+    "admin": "Admin",
+
+    "add_category":"Add Category",
+    "category_name":"Category Name",
+    "category_description" : "Category Description", 
+    "is_special_category" : "Checkbox"
 }
