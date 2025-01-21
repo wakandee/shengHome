@@ -53,6 +53,17 @@ header {
 /*    border: 1px solid hotpink;*/
 }
 
+.top_nav2 {
+/*    width: 6%;*/
+/*    margin:0 auto;*/
+/*    padding: 10px 5px;*/
+/*    transition: all 0.3s ease;*/
+/*    font-size:20px;*/
+    display:flex;
+    align-items:center;
+/*    border: 1px solid hotpink;*/
+}
+
 .second_nav {
     padding: 10px 20px;
 }
@@ -67,7 +78,11 @@ header {
     height: auto;
 }
 
-
+nav{
+    display: flex;
+    flex-direction: row;
+/*    border: 1px solid hotpink;*/
+}
 
 nav ul {
     list-style: none;
@@ -551,8 +566,9 @@ p {
     display: flex;
     width: 100%;
     align-items: center;
-    margin: 0 auto;
-    
+    flex-direction: row;
+    margin:auto;
+    justify-content: center;    
 }
 
 .search_box div{
@@ -572,22 +588,16 @@ p {
 
 .search_box input{
     background-color: #eee;
-    border: none;
     margin: 8px 0;
     padding: 10px 15px;
     font-size: 13px;
-    border-radius: 8px;
-    width: 100%;
+    width: 50%;
     outline: none;
-}
-
-.search_box input {
-    padding: 10px;
-    width: 70%;
     border: 1px solid #ccc;
     border-radius: 4px;
     margin-right: 10px;
 }
+
 
 .search_box button{
 /*    background-color: #512da8;*/
@@ -600,7 +610,7 @@ p {
     font-weight: 600;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-/*    margin-top: 10px;*/
+    margin-right: 10px;
     cursor: pointer;
 }
 
@@ -1545,7 +1555,7 @@ p {
 /* Textarea Styling */
 .add_word_textarea {
     resize: vertical;
-    min-height: 100px;
+    min-height: 50px;
 }
 
 /* Submit Button Styling */
@@ -1564,4 +1574,26 @@ p {
 
 .add_word_button:hover {
     background-color: #0056b3;
+}
+
+
+
+
+.words_list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 20px;
+}
+.words_list .card {
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    background-color: #fff;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+}
+.words_list p {
+    margin: 5px 0;
 }

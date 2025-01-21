@@ -9,13 +9,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 </head>
+
 <body>
     <header>
-      <nav class="top_nav">
-    <img src="{{ url_for('static', filename='images/logo.jfif') }}" alt="logo" class="logo">ShengHome 
-</nav>
+        <!-- <nav class="top_nav">
+            <img src="{{ url_for('static', filename='images/logo.jfif') }}" alt="logo" class="logo">ShengHome 
+        </nav> -->
 
         <nav>
+            <div class="top_nav2">
+                <img src="{{ url_for('static', filename='images/logo.jfif') }}" alt="logo" class="logo">ShengHome 
+            </div>
             <ul class="nav-links">
                 <li class="{% if request.endpoint == 'home' %}active{% endif %}"><a href="{{ url_for('home') }}" class="nav-item">{{ translations['home'] }}</a></li>
                 <li class="{% if request.endpoint == 'translate' %}active{% endif %}"><a href="{{ url_for('translate') }}" class="nav-item">{{ translations['translate'] }}</a></li>
@@ -23,6 +27,14 @@
                 <li class="{% if request.endpoint == 'lyrics' %}active{% endif %}"><a href="{{ url_for('lyrics') }}" class="nav-item">{{ translations['lyrics'] }}</a></li>
                 <li class="{% if request.endpoint == 'statistics' %}active{% endif %}"><a href="{{ url_for('statistics') }}" class="nav-item">statistics</a></li>
                 <!-- <li class="{% if request.endpoint == 'trending_phrases' %}active{% endif %}"><a href="{{ url_for('trending_phrases') }}" class="nav-item">Trending Phrases</a></li> -->
+                
+
+                <li class="{% if request.endpoint == 'about' %}active{% endif %}"><a href="{{ url_for('about') }}" class="nav-item">{{ translations['about'] }}</a></li>
+
+                <li class="{% if request.endpoint == 'admin' %}active{% endif %}"><a href="{{ url_for('admin') }}" class="nav-item">{{ translations['admin'] }}</a></li>
+                
+            </ul>
+            <ul class="right">
                 <li class="settings-item">
                     <div class="dropdown">
                         <i class="fas fa-cog setting_toggle" title="Settings"></i>
@@ -62,18 +74,12 @@
                         </div>
                     </div>
                 </li>
-
-                <li class="{% if request.endpoint == 'about' %}active{% endif %}"><a href="{{ url_for('about') }}" class="nav-item">{{ translations['about'] }}</a></li>
-
                 {% if 'username' in session %}
                 <li><a href="{{ url_for('profile') }}" class="nav-item">{{ translations['profile'] }}</a></li>
                     <!-- <li><a href="{{ url_for('logout') }}" class="nav-item">{{ translations['logout'] }}</a></li> -->
                 {% else %}
                     <li><a href="{{ url_for('login_register') }}" class="nav-item">{{ translations['login_register'] }}</a></li>
                 {% endif %}
-
-                <li class="{% if request.endpoint == 'admin' %}active{% endif %}"><a href="{{ url_for('admin') }}" class="nav-item">{{ translations['admin'] }}</a></li>
-                
             </ul>
         </nav>
     </header>

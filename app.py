@@ -275,33 +275,33 @@ def logout():
 
 @app.route('/translate', methods=['GET', 'POST'])
 def translate():
-    from models import words  # Import your `words` model if not already done
-    
-    # Default behavior to fetch all words
+    search_query = request.args.get('q', '').strip()  # Get the search query from the URL params
+
+    if search_query:
+        words_list = words.query.filter(words.word.ilike(f"%{search_query}%")).all()  # Replace words with your actual model class
+    else:
+        words_list = words.query.all()  # Fetch all words if no search query
+
+    # Handle AJAX request by checking the "X-Requested-With" header
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify([
+            {
+                "id": word.id,
+                "word": word.word,
+                "translation": word.translation,
+                "example": word.example,
+                "synonyms": [synonym.name for synonym in word.synonyms],
+                "credits": word.credits
+            } for word in words_list
+        ])
+
     language = request.cookies.get('language') or 'en'
     translations = load_language(language)
     
-    if request.method == 'POST':
-        sheng_word = request.form['sheng_word'].strip()  # Remove extra spaces
-        
-        if sheng_word:  # If search text is provided, filter words
-            filtered_words = words.query.filter(words.word.ilike(f"%{sheng_word}%")).all()
-        else:  # If no search text, fetch all words
-            filtered_words = words.query.all()
-        
-        return render_template(
-            'translate.html',
-            translations=translations,
-            words=filtered_words
-        )
-    
-    # Fetch all words for the initial GET request
-    all_words = words.query.all()
-    return render_template(
-        'translate.html',
-        translations=translations,
-        words=all_words
-    )
+    # Render the full page for non-AJAX requests
+    return render_template('translate.html', translations=translations, words=words_list)
+
+
 
 
 @app.route('/add_word', methods=['GET', 'POST'])
