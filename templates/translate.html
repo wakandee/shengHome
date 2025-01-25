@@ -33,21 +33,22 @@
                 {% for word in words %}
                 <div class="card">
                     <div class="card_content">
+
                         <p class="sheng_word">{{ word.word }}
-                            {% if word.verified %}
+                            {% if word.votes_count >=2 %}
                             <i class="fa fa-check-circle verified_icon" aria-hidden="true"></i>
                             {% endif %}
                         </p>
                         <p>Meaning: {{ word.translation }}</p>
                         <p>Synonyms: {{ word.synonyms | map(attribute='name') | join(', ') }}</p>
                         <p>Example: "{{ word.example }}"</p>
-                        <p>Credits: {{ word.credits }}</p>
+                        <p>Credits: {{ word.creator_name }}</p>
                     </div>
                     <div class="card_footer">
                         <div class="vote_buttons">
-                            <button class="upvote_button">▲ Upvote</button>
-                            <span class="vote_count">{{ word.votes|length }}</span>
-                            <button class="downvote_button">▼ Downvote</button>
+                            <button class="upvote_button" data-word-id="{{word.id}}">▲ Upvote</button>
+                            <span class="vote_count">{{ word.votes_count }}</span>
+                            <button class="downvote_button" data-word-id="{{word.id}}">▼ Downvote</button>
                         </div>
                     </div>
                 </div>
@@ -92,9 +93,9 @@
                         </div>
                         <div class="card_footer">
                             <div class="vote_buttons">
-                                <button class="upvote_button">▲ Upvote</button>
-                                <span class="vote_count">0</span>
-                                <button class="downvote_button">▼ Downvote</button>
+                                <button class="upvote_button" data-word-id="${word.id}">▲ Upvote</button>
+                                <span class="vote_count">${word.votes|length}</span>
+                                <button class="downvote_button" data-word-id="${word.id}">▼ Downvote</button>
                             </div>
                         </div>
                     </div>
@@ -112,6 +113,48 @@
         const query = document.getElementById('search_input').value;
         performSearch(query);
     });
+
+
+
+
+
+// Add event listener to handle voting
+const handleVote = (wordId, voteType) => {
+    fetch('/word/vote', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ word_id: wordId, vote_type: voteType })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            alert(data.message);
+            // Optionally, reload the words list to reflect the updated vote count
+            performSearch(document.getElementById('search_input').value);
+        }
+    })
+    .catch(err => {
+        console.error('Error submitting vote:', err);
+        alert('An error occurred. Please try again.');
+    });
+};
+
+// Add event listeners to dynamically loaded vote buttons
+document.addEventListener('click', (event) => {
+    if (event.target.classList.contains('upvote_button')) {
+        const wordId = event.target.getAttribute('data-word-id');
+        handleVote(wordId, true); // True for upvote
+    } else if (event.target.classList.contains('downvote_button')) {
+        const wordId = event.target.getAttribute('data-word-id');
+        handleVote(wordId, false); // False for downvote
+    }
+});
+
 </script>
 
 {% endblock %}

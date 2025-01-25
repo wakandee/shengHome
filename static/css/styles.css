@@ -273,6 +273,7 @@ nav ul li.active a {
     margin: 1% auto;
     justify-content: space-between;
     padding: 2%;
+    flex-direction: column;
 }
 
 /* Small devices (phones, 600px and down) */
@@ -538,6 +539,122 @@ footer {
 }
 
 
+/* Footer Section */
+.footer_section {
+    text-align: center;
+    padding: 20px;
+    background: #f0f4f8;
+    box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    margin-top: 2%;
+    color: #333;
+}
+
+/* Footer Container */
+.footer_container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Footer Branding */
+.footer_branding {
+    margin: 2%;
+    text-align: center;
+}
+
+.footer_title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Footer Navigation */
+.footer_navigation {
+    text-align: left;
+}
+
+.footer_links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer_links li {
+    margin-bottom: 10px;
+}
+
+.footer_links a {
+    text-decoration: none;
+    color: #007bff;
+    transition: color 0.3s ease;
+}
+
+.footer_links a:hover {
+    color: #0056b3;
+}
+
+/* Contact Information */
+.footer_contact {
+    text-align: left;
+}
+
+/* Newsletter Subscription */
+.footer_newsletter {
+    text-align: left;
+}
+
+.newsletter_form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.newsletter_input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1rem;
+    width: 100%;
+}
+
+.newsletter_button {
+    background: #007bff;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.3s ease;
+}
+
+.newsletter_button:hover {
+    background: #0056b3;
+}
+
+/* Social Media */
+.footer_social_media {
+    margin-top: 20px;
+}
+
+.social_link {
+    margin: 0 10px;
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+}
+
+.social_link:hover {
+    color: #0056b3;
+}
+
+
+
 
 /* General Styles */
 .maain_container {
@@ -697,14 +814,19 @@ p {
     margin-bottom: 20px;
 }
 
-.card_content .verified_icon {
-    font-size: 22px; /* Adjust size as needed */
-    color: #007bff; /* Blue color */
+.verified_icon {
+    color: #28a745;
+    margin-left: 5px;
+}
+
+/*.card_content .verified_icon {
+    font-size: 22px; /* Adjust size as needed 
+    color: #007bff; /* Blue color 
     position: absolute;
     top: 0;
     right: 0;
     transform: translate(50%, -50%);
-}
+}*/
 
 /* Verification Link Styling */
 .verify-link {
@@ -732,6 +854,11 @@ p {
 .translation {
     font-size: 18px;
     color: #444;
+}
+
+.translation {
+    font-style: italic;
+    color: #555;
 }
 
 /* Vote Buttons and Footer */
@@ -1596,4 +1723,108 @@ p {
 }
 .words_list p {
     margin: 5px 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Welcome Section */
+.welcome_section {
+    text-align: center;
+    margin-bottom: 30px;
+    width: 100%;
+    border: ;
+}
+
+.welcome_section h1 {
+    font-size: 2.5rem;
+    color: #007bff;
+}
+
+.welcome_section p {
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Carousel Section */
+.carousel_section {
+    width: 100%;
+    margin: 20px 0;
+}
+
+.carousel_category h2 {
+    font-size: 1.5rem;
+    margin-left: 10%;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Carousel Wrapper */
+.carousel_words_wrapper {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    margin: 0 auto;
+}
+
+/* Carousel Words */
+.carousel_words {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    gap: 15px;
+    transform: translateX(0%);
+}
+
+/* Word Card */
+.word_card {
+    min-width: 200px;
+    flex: 0 0 auto;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+.word_card:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+
+
+
+
+/* Dots Navigation */
+.carousel_dots {
+    margin-top: 20px;
+    margin-left: 20%;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dot.active {
+    background-color: #007bff;
 }

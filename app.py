@@ -5,6 +5,7 @@ from utils.db_helper import check_and_create_db
 from flask_migrate import Migrate
 import datetime
 from sqlalchemy import inspect  # Import inspect
+from sqlalchemy import func, case
 import hashlib # for hashing password into Sha256
 from werkzeug.utils import secure_filename, os
 from datetime import datetime, timedelta
@@ -86,18 +87,15 @@ def load_language(lang):
 def home():
     # Detect the user's preferred language from a cookie or default to 'en' (English)
     language = request.cookies.get('language') or 'en'
+
+    words_list = get_words_with_votes()
+    words_list_trimmed = words_list[:len(words_list) // 2]  # Slicing the list to 1/3 of its original length
     
     # Load the corresponding language file from the 'locales' folder
     translations = load_language(language)
     
     # Render the HTML template with translations passed to it
-    return render_template('home.html', translations=translations)
-
-# Route to send email directly
-@app.route('/send_email')
-def send_email_route():
-    send_email(app, 'Hello from Flask', 'allanwakande@gmail.com', 'This is a test email sent from Flask.')
-    return 'Email sent!'
+    return render_template('home.html', translations=translations, words_list=words_list, words_list_trimmed=words_list_trimmed)
 
 @app.route('/login_register', methods=['GET', 'POST'])
 def login_register():
@@ -273,14 +271,85 @@ def logout():
     session.pop('username', None)
     return redirect(url_for('home'))
 
+
+def get_votes():
+    # Query the word_votes table to calculate upvotes and downvotes for each word
+    votes_data = db.session.query(
+        word_votes.word_id,
+        func.sum(case((word_votes.vote_type == True, 1), else_=0)).label('upvotes'),
+        func.sum(case((word_votes.vote_type == False, 1), else_=0)).label('downvotes'),
+        (
+            func.sum(case((word_votes.vote_type == True, 1), else_=0)) -
+            func.sum(case((word_votes.vote_type == False, 1), else_=0))
+        ).label('votes')
+    ).group_by(word_votes.word_id).all()
+
+    return votes_data
+
+def get_words_with_votes():
+    # Retrieve votes data
+    votes_data = get_votes()
+    votes_dict = {vote.word_id: vote.votes for vote in votes_data}
+
+    # Query words and join with User table
+    query_result = db.session.query(
+        words,
+        User.fname,
+        User.other_name
+    ).join(User, words.created_by == User.user_id).all()
+
+    # Map results to ORM instances with added attributes
+    words_with_votes = []
+    for word, fname, other_name in query_result:
+        word.votes_count = votes_dict.get(word.id, 0)  # Default to 0 votes
+        word.creator_name = f"{fname} {other_name}"  # Combine creator's name
+        words_with_votes.append(word)
+
+    return words_with_votes
+
+
+def search_words_with_votes(search_query):
+    # Build the query to calculate votes
+    votes_query = db.session.query(
+        word_votes.word_id,
+        (
+            func.sum(case((word_votes.vote_type == True, 1), else_=0)) -
+            func.sum(case((word_votes.vote_type == False, 1), else_=0))
+        ).label('votes')
+    ).group_by(word_votes.word_id).subquery()
+
+    # Query words with filtering and join with votes and User table
+    query_result = db.session.query(
+        words,
+        func.coalesce(votes_query.c.votes, 0).label('votes_count'),
+        User.fname,
+        User.other_name
+    ).outerjoin(votes_query, words.id == votes_query.c.word_id)\
+     .join(User, words.created_by == User.user_id)
+
+    if search_query:
+        query_result = query_result.filter(words.word.ilike(f"%{search_query}%"))
+
+    # Map results to ORM instances with added attributes
+    words_with_votes = []
+    for word, votes_count, fname, other_name in query_result.all():
+        word.votes_count = votes_count
+        word.creator_name = f"{fname} {other_name}"
+        words_with_votes.append(word)
+
+    return words_with_votes
+
+
+
+
 @app.route('/translate', methods=['GET', 'POST'])
 def translate():
     search_query = request.args.get('q', '').strip()  # Get the search query from the URL params
 
     if search_query:
-        words_list = words.query.filter(words.word.ilike(f"%{search_query}%")).all()  # Replace words with your actual model class
+        words_list = search_words_with_votes(search_query)
     else:
-        words_list = words.query.all()  # Fetch all words if no search query
+        words_list = get_words_with_votes()
 
     # Handle AJAX request by checking the "X-Requested-With" header
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -291,17 +360,56 @@ def translate():
                 "translation": word.translation,
                 "example": word.example,
                 "synonyms": [synonym.name for synonym in word.synonyms],
-                "credits": word.credits
+                "creator_name": word.creator_name,  # Include creator's full name
+                "votes": word.votes_count  # Include computed votes
             } for word in words_list
         ])
 
     language = request.cookies.get('language') or 'en'
     translations = load_language(language)
-    
+
     # Render the full page for non-AJAX requests
     return render_template('translate.html', translations=translations, words=words_list)
 
 
+
+
+@app.route('/word/vote', methods=['POST'])
+def vote_word():
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized, Please Sign in First"}), 401  # User not logged in
+
+    user_id = session['user_id']
+    word_id = request.json.get('word_id')
+    vote_type = request.json.get('vote_type')  # True for upvote, False for downvote
+
+    # Validate input
+    if word_id is None or vote_type not in [True, False]:
+        return jsonify({"error": "Invalid request"}), 400
+
+    # Check if the user already voted for this word
+    existing_vote = word_votes.query.filter_by(user_id=user_id, word_id=word_id).first()
+
+    if existing_vote:
+        return jsonify({"error": "You have already voted this way."}), 400
+        # if existing_vote.vote_type == vote_type:
+        # if existing_vote.vote_type:
+        #     return jsonify({"error": "You have already voted this way."}), 400
+        # else:
+        #     # Update the vote type if the user changes their vote
+        #     existing_vote.vote_type = vote_type
+        #     db.session.commit()
+        #     return jsonify({"message": "Vote updated successfully."}), 200
+
+    # Add a new vote
+    new_vote = word_votes(
+        word_id=word_id,
+        vote_type=vote_type,
+        user_id=user_id
+    )
+    db.session.add(new_vote)
+    db.session.commit()
+    return jsonify({"message": "Vote added successfully."}), 201
 
 
 @app.route('/add_word', methods=['GET', 'POST'])
@@ -332,6 +440,47 @@ def add_word():
     language = request.cookies.get('language') or 'en'
     translations = load_language(language)
     return render_template('add_word.html', translations=translations, categories=all_categories)
+
+# @app.route('/word/vote', methods=['POST'])
+# def vote_word():
+#     if 'user_id' not in session:
+#         flash("Unauthorized. Please log in to vote.", "error")
+#         return jsonify({"status": "error", "flash": "Unauthorized. Please log in to vote."}), 401
+
+#     user_id = session['user_id']
+#     word_id = request.json.get('word_id')
+#     vote_type = request.json.get('vote_type')  # True for upvote, False for downvote
+
+#     # Validate input
+#     if word_id is None or vote_type not in [True, False]:
+#         flash("Invalid vote request.", "error")
+#         return jsonify({"status": "error", "flash": "Invalid vote request."}), 400
+
+#     # Check if the user already voted for this word
+#     existing_vote = word_votes.query.filter_by(user_id=user_id, word_id=word_id).first()
+
+#     if existing_vote:
+#         if existing_vote.vote_type == vote_type:
+#             flash("You have already voted this way.", "error")
+#             return jsonify({"status": "error", "flash": "You have already voted this way."}), 400
+#         else:
+#             # Update the vote type if the user changes their vote
+#             existing_vote.vote_type = vote_type
+#             db.session.commit()
+#             flash("Your vote has been updated successfully.", "success")
+#             return jsonify({"status": "success", "flash": "Your vote has been updated successfully."}), 200
+
+#     # Add a new vote
+#     new_vote = word_votes(
+#         word_id=word_id,
+#         vote_type=vote_type,
+#         user_id=user_id
+#     )
+#     db.session.add(new_vote)
+#     db.session.commit()
+#     flash("Your vote has been added successfully.", "success")
+#     return jsonify({"status": "success", "flash": "Your vote has been added successfully."}), 201
+
 
 
 

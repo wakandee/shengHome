@@ -4,6 +4,155 @@
 <div class="main_container">
     <!-- Main Content Section -->
     <div class="main_content">
+        <br>
+        <!-- Search Box -->
+        <div class="search_box">
+            <!-- <div> -->
+
+                <input
+                    type="text" 
+                    id="search_input" 
+                    placeholder="Search Sheng phrases..." 
+                    oninput="performSearch(this.value)"
+                >
+                <button type="submit" id="search_button">Search</button>
+                <!-- <div class="words_box"> -->
+                    <a href="{{ url_for('add_word') }}">
+            <button>Define a Sheng Word</button></a>
+                <!-- <a href="{{ url_for('add_word') }}" class="btn">+ Add New Word</a> -->
+            <!-- </div> -->
+        </div>
+
+        <!-- Display results here -->
+        <div class="word_placeholders">
+            <!-- <div class="title">
+                <h2>Popular Words</h2>
+            </div> -->
+            <div id="words_list" class="words_list">
+                <!-- Words will be dynamically loaded here -->
+                {% for word in words %}
+                <div class="card">
+                    <div class="card_content">
+                        <p class="sheng_word">{{ word.word }}
+                            {% if word.verified %}
+                            <i class="fa fa-check-circle verified_icon" aria-hidden="true"></i>
+                            {% endif %}
+                        </p>
+                        <p>Meaning: {{ word.translation }}</p>
+                        <p>Synonyms: {{ word.synonyms | map(attribute='name') | join(', ') }}</p>
+                        <p>Example: "{{ word.example }}"</p>
+                        <p>Credits: {{ word.credits }}</p>
+                    </div>
+                    <div class="card_footer">
+                        <div class="vote_buttons">
+                            <button class="upvote_button">▲ Upvote</button>
+                            <span class="vote_count">{{ word.votes|length }}</span>
+                            <button class="downvote_button">▼ Downvote</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const performSearch = (query) => {
+        const wordsList = document.getElementById('words_list');
+        if (!query) {
+            // Reload the page to show all words if query is empty
+            window.location.href = '/translate';
+            return;
+        }
+
+        fetch(`/translate?q=${encodeURIComponent(query)}`, {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            wordsList.innerHTML = ''; // Clear the current list
+
+            if (data.length === 0) {
+                wordsList.innerHTML = '<p>No results found.</p>';
+                return;
+            }
+
+            data.forEach(word => {
+                const synonyms = word.synonyms.join(', ') || 'None';
+                const card = `
+                    <div class="card">
+                        <div class="card_content">
+                            <p class="sheng_word">${word.word}</p>
+                            <p>Meaning: ${word.translation}</p>
+                            <p>Synonyms: ${synonyms}</p>
+                            <p>Example: "${word.example || 'N/A'}"</p>
+                            <p>Credits: ${word.credits || 'Anonymous'}</p>
+                        </div>
+                        <div class="card_footer">
+                            <div class="vote_buttons">
+                                <button class="upvote_button">▲ Upvote</button>
+                                <span class="vote_count">0</span>
+                                <button class="downvote_button">▼ Downvote</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                wordsList.innerHTML += card;
+            });
+        })
+        .catch(err => {
+            console.error('Error fetching search results:', err);
+        });
+    };
+
+    // Event listener for the search button
+    document.getElementById('search_button').addEventListener('click', () => {
+        const query = document.getElementById('search_input').value;
+        performSearch(query);
+    });
+</script>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="main_container">
+    <!-- Main Content Section -->
+    <div class="main_content">
     <br>
      <!-- Search Box -->
     <div class="search_box">

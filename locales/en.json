@@ -3,7 +3,7 @@
     "translate": "Translate",
     "categories": "Categories",
     "lyrics": "Lyrics",
-    "login_register": "Login / Register",
+    "login_register": "Login | Signup",
     "logout": "Logout",
     "about": "About",
     "settings": "Settings",
@@ -12,12 +12,20 @@
     "english": "English",
     "kiswahili": "Kiswahili",
     "sheng": "Sheng",
-    "profile":"profile",
+    "profile":"Profile",
     "welcome": "Welcome to Sheng Translator",
     "admin": "Admin",
 
     "add_category":"Add Category",
     "category_name":"Category Name",
     "category_description" : "Category Description", 
-    "is_special_category" : "Checkbox"
+    "is_special_category" : "Checkbox",
+
+    "meaning":"Meaning",
+    "synonyms":"Synonyms",
+    "example":"Example",
+    "english":"English",
+    "credits":"Credits",
+    "votes":"votes",
+    "latest_words":"Latest Words"
 }

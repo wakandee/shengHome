@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="main_container">
+    <!-- Main Content Section -->
+    <div class="main_content">
+        <div class="carousel_section">
+            <div class="carousel_category">
+                <h2>Latest Words</h2>
+                <div class="carousel_words" id="latest_words">
+                    <!-- Word Card -->
+                    <div class="word_card">
+                        <p class="sheng_word">Shash
+                            <i class="fa fa-check-circle verified_icon" aria-hidden="true"></i>
+                        </p>
+                        <p>Meaning: Money</p>
+                        <p>Synonyms: Pesa, Mkwanja</p>
+                        <p>Example: "Huyu jamaa ako na shash nyingi."</p>
+                        <p class="translation">English: Money</p>
+                        <p>Credits: User1</p>
+                    </div>
+                    <!-- Add more word cards dynamically -->
+                </div>
+                <button class="carousel_button view_more">View More</button>
+            </div>
+
+            <div class="carousel_category">
+                <h2>Popular Words</h2>
+                <div class="carousel_words" id="popular_words">
+                    <!-- Word Card -->
+                    <div class="word_card">
+                        <p class="sheng_word">Nduthi
+                            <i class="fa fa-check-circle verified_icon" aria-hidden="true"></i>
+                        </p>
+                        <p>Meaning: Motorcycle</p>
+                        <p>Synonyms: Boda, Pikipiki</p>
+                        <p>Example: "Nduthi imekuwa maarufu sana."</p>
+                        <p class="translation">English: Motorcycle</p>
+                        <p>Credits: User2</p>
+                    </div>
+                    <!-- Add more word cards dynamically -->
+                </div>
+                <button class="carousel_button view_more">View More</button>
+            </div>
+
+            <div class="carousel_category">
+                <h2>Noun Words</h2>
+                <div class="carousel_words" id="noun_words">
+                    <!-- Word Card -->
+                    <div class="word_card">
+                        <p class="sheng_word">Mbogi
+                            <i class="fa fa-check-circle verified_icon" aria-hidden="true"></i>
+                        </p>
+                        <p>Meaning: Crew/Group</p>
+                        <p>Synonyms: Gang, Team</p>
+                        <p>Example: "Mbogi iko area leo."</p>
+                        <p class="translation">English: Group</p>
+                        <p>Credits: User3</p>
+                    </div>
+                    <!-- Add more word cards dynamically -->
+                </div>
+                <button class="carousel_button view_more">View More</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
