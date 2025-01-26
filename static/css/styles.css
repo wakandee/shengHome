@@ -1871,3 +1871,67 @@ p {
 .dot.active {
     background-color: #007bff;
 }
+
+
+
+
+/*statistics style*/
+.statistics {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    padding: 20px;
+}
+
+.stat-item {
+    background: var(--bg-color);
+    box-shadow: 8px 8px 20px var(--box-shadow-dark), -8px -8px 20px var(--box-shadow-light);
+    padding: 20px;
+    border-radius: 16px;
+    width: 30%;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 10px 10px 25px var(--box-shadow-dark), -10px -10px 25px var(--box-shadow-light);
+}
+
+.stat-item h4 {
+    color: #007bff;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.stat-item p {
+    font-size: 1.2em;
+    margin: 0;
+    color: #333;
+}
+
+.stat-item ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px 0;
+    color: #444;
+}
+
+.stat-item ul li {
+    padding: 5px 0;
+    font-size: 1em;
+    border-bottom: 1px solid var(--box-shadow-light);
+}
+
+.graphs {
+    margin-top: 30px;
+    text-align: center;
+}
+
+canvas {
+    max-width: 100%;
+    margin: 20px auto;
+    border-radius: 16px;
+    box-shadow: 5px 5px 15px var(--box-shadow-dark), -5px -5px 15px var(--box-shadow-light);
+}

@@ -42,7 +42,7 @@
                         <p>Meaning: {{ word.translation }}</p>
                         <p>Synonyms: {{ word.synonyms | map(attribute='name') | join(', ') }}</p>
                         <p>Example: "{{ word.example }}"</p>
-                        <p>Credits: {{ word.creator_name }}</p>
+                        <p>Credits: {{ word.username }}</p>
                     </div>
                     <div class="card_footer">
                         <div class="vote_buttons">

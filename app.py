@@ -346,14 +346,16 @@ def get_words_with_votes():
     query_result = db.session.query(
         words,
         User.fname,
-        User.other_name
+        User.other_name,
+        User.username
     ).join(User, words.created_by == User.user_id).all()
 
     # Map results to ORM instances with added attributes
     words_with_votes = []
-    for word, fname, other_name in query_result:
+    for word, fname, other_name, username in query_result:
         word.votes_count = votes_dict.get(word.id, 0)  # Default to 0 votes
         word.creator_name = f"{fname} {other_name}"  # Combine creator's name
+        word.username = f"{username}"
         words_with_votes.append(word)
 
     reversed_words = words_with_votes[::-1]
@@ -835,10 +837,22 @@ def statistics():
     ).join(Article_Vote, Article_Vote.article_id == Article.article_id).group_by(Article.article_id).order_by(db.func.count(Article_Vote.article_id).desc()).limit(5).all()
 
     # Word vote statistics
+    # word_vote_stats = db.session.query(word_votes.word, db.func.count(word_votes.id).label('vote_count')).group_by(word_votes.word_id).all()
+
+    # word_vote_stats = db.session.query(word_votes.word_id, db.func.count(word_votes.id).label('vote_count')
+    # ).group_by(word_votes.word_id).order_by(db.func.count(word_votes.id).desc()).limit(5).all()
+
     word_vote_stats = db.session.query(
-        word_votes.word_id,
-        db.func.count(word_votes.id).label('vote_count')
-    ).group_by(word_votes.word_id).order_by(db.func.count(word_votes.id).desc()).limit(5).all()
+    word_votes.word_id,
+    words.word.label('word'),  # Assuming 'name' is the column for the word itself in the 'words' table
+    db.func.count(word_votes.id).label('vote_count')
+    ).join(
+        words, word_votes.word_id == words.id  # Join the word_votes table with the words table on the word_id
+    ).group_by(
+        word_votes.word_id, words.word  # Group by both word_id and word name
+    ).order_by(
+        db.func.count(word_votes.id).desc()
+    ).limit(5).all()
 
     # Total number of categories
     total_categories = Categories.query.count()
@@ -861,7 +875,7 @@ def statistics():
 
     language = request.cookies.get('language') or 'en'
     translations = load_language(language)
-    
+
     return render_template(
         'statistics.html',
         total_articles=total_articles,
