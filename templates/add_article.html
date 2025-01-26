@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="main_container">
+    <div class="category_add_container">
+        <h2 class="category_add_header">{{ translations['add_article']}}</h2>
+        <form action="{{ url_for('add_article') }}" method="POST" class="category_add_form">
+            <div class="category_add_form_group">
+                <label for="title" class="category_add_label">Title:</label>
+                <input type="text" id="title" name="title" class="category_add_input" placeholder="Enter article title" required>
+            </div>
+            <div class="category_add_form_group">
+                <label for="content" class="category_add_label">Content:</label>
+                <textarea id="content" name="content" class="category_add_textarea" placeholder="Enter article content" required></textarea>
+            </div>
+            <button type="submit" class="category_add_button">Add Article</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

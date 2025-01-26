@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, make_response, flash
 from config import Config # Import configuration settings
 from models import db, User, Avatar, UserVerification, Categories, synonyms, word_votes, words, Artist,Song
+from models import Article_Vote,Article
 from utils.db_helper import check_and_create_db
 from flask_migrate import Migrate
 import datetime
@@ -57,7 +58,8 @@ with app.app_context():
     inspector = inspect(db.engine)  # Create an inspector object
     
     # List of tables to check
-    required_tables = ['users', 'avatars', 'user_verifications', 'word_votes', 'synonyms', 'words', 'categories', 'artist','artist_songs']
+    required_tables = ['users', 'avatars', 'user_verifications', 'word_votes', 'synonyms', 
+    'words', 'categories', 'artist','artist_songs', 'articles', '']
     
     existing_tables = inspector.get_table_names()  # Fetch existing tables
     
@@ -66,6 +68,16 @@ with app.app_context():
         if table not in existing_tables:
             print(f"Creating table: {table}")
             db.create_all()  # This will create all missing tables defined in the models
+
+# User Login Check Decorator
+def login_required(f):
+    def wrapper(*args, **kwargs):
+        if 'user_id' not in session:
+            flash('You need to log in to perform this action.', 'error')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    wrapper.__name__ = f.__name__
+    return wrapper
 
 @app.route('/set_language/<lang>')
 def set_language(lang):
@@ -597,19 +609,30 @@ def add_song():
         artist_id = request.form.get('artist_id')
         created_by = session.get('user_id')  # Fetch user_id from session
 
-        if song_title and artist_id:
-            new_song = Song(
-                title=song_title,
-                description=song_description,
-                artist_id=int(artist_id),
-                created_by=created_by
-            )
-            db.session.add(new_song)
-            db.session.commit()
-            flash(translations['song_added_successfully'], 'success')
-            return redirect(url_for('add_song'))
+        # Check if the song title already exists for the selected artist
+        existing_song = Song.query.filter_by(title=song_title, artist_id=artist_id).first()
+
+        if existing_song:
+            flash(f"Song '{song_title}' by {existing_song.artist.name} already exists!", 'error')
         else:
-            flash(translations['song_title_and_artist_required'], 'error')
+            if song_title and artist_id:
+                # Check if the title already exists (without checking the artist)
+                duplicate_title = Song.query.filter_by(title=song_title).first()
+                if duplicate_title:
+                    flash(f"Song title '{song_title}' already exists! Please use a different title.", 'error')
+                else:
+                    new_song = Song(
+                        title=song_title,
+                        description=song_description,
+                        artist_id=int(artist_id),
+                        created_by=created_by
+                    )
+                    db.session.add(new_song)
+                    db.session.commit()
+                    flash('Song Added Successfully', 'success')
+                    return redirect(url_for('add_song'))
+            else:
+                flash('Song Title and Artist Required', 'error')
 
     return render_template('add_song.html', translations=translations, artists=artists)
 
@@ -619,7 +642,139 @@ def add_song():
 def articles():
     language = request.cookies.get('language') or 'en'
     translations = load_language(language)
-    return render_template('articles.html', translations=translations)
+
+    # Fetch all articles with their vote counts and author name
+    all_articles = (
+        db.session.query(
+            Article.article_id,  # Use article_id as the primary key
+            Article.title,
+            Article.content,
+            User.username.label('author_name'),  # Assuming 'username' is the author's name
+            Article.created_at,
+            db.func.sum(db.case(  # Corrected usage of db.case()
+                (Article_Vote.vote_type == True, 1), 
+                else_=0
+            )).label('upvotes'),
+            db.func.sum(db.case(  # Corrected usage of db.case()
+                (Article_Vote.vote_type == False, 1), 
+                else_=0
+            )).label('downvotes'),
+        )
+        .outerjoin(Article_Vote, Article.article_id == Article_Vote.article_id)  # Join on article_id
+        .join(User, User.user_id == Article.created_by)  # Join User to fetch author name
+        .group_by(Article.article_id, User.user_id)  # Group by article_id, not id
+        .all()
+    )
+
+    # Transform the query results into a list of dictionaries
+    articles_with_votes = [
+        {
+            'id': article.article_id,  # Use article_id here
+            'title': article.title,
+            'content': article.content,
+            'author_name': article.author_name,
+            'created_at': article.created_at,
+            'upvotes': article.upvotes or 0,
+            'downvotes': article.downvotes or 0,
+            'votes_count': (article.upvotes or 0) - (article.downvotes or 0),
+        }
+        for article in all_articles
+    ]
+
+    return render_template('articles.html', translations=translations, articles=articles_with_votes)
+
+
+# @app.route('/articles')
+# def articles():
+#     language = request.cookies.get('language') or 'en'
+#     translations = load_language(language)
+
+#     all_articles = Article.query.all()
+#     return render_template('articles.html',translations=translations,  articles=all_articles)
+
+
+@app.route('/add_article', methods=['GET', 'POST'])
+@login_required
+def add_article():
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        user_id = session['user_id']
+
+        # Create a new article
+        new_article = Article(title=title, content=content, created_by=user_id)
+        db.session.add(new_article)
+        db.session.commit()
+
+        flash('Article added successfully!', 'success')
+        return redirect(url_for('articles'))
+
+    return render_template('add_article.html', translations=translations)
+
+
+@app.route('/article/vote', methods=['POST'])
+def vote_article():
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized, Please Sign in First"}), 401
+
+    user_id = session['user_id']
+    article_id = request.json.get('article_id')
+    vote_type = request.json.get('vote_type')  # True for upvote, False for downvote
+
+    # Validate input
+    if not isinstance(article_id, int) or not isinstance(vote_type, bool):
+        return jsonify({"error": "Invalid article_id or vote_type"}), 400
+
+    # Check if the user already voted for this article
+    existing_vote = Article_Vote.query.filter_by(user_id=user_id, article_id=article_id).first()
+
+    if existing_vote:
+        return jsonify({"error": "You have already voted this way."}), 400
+        # Uncomment the lines below to allow vote updates:
+        # existing_vote.vote_type = vote_type
+        # db.session.commit()
+        # return jsonify({"message": "Vote updated successfully."}), 200
+
+    # Add a new vote
+    new_vote = Article_Vote(
+        article_id=article_id,
+        vote_type=vote_type,
+        user_id=user_id
+    )
+    db.session.add(new_vote)
+    db.session.commit()
+    return jsonify({"message": "Vote added successfully."}), 201
+
+
+
+@app.route('/articlessss/vote/<int:article_id>/<int:vote_value>', methods=['POST'])
+@login_required
+def vote(article_id, vote_value):
+    if vote_value not in [-1, 1]:
+        flash('Invalid vote value.', 'error')
+        return redirect(url_for('articles'))
+
+    user_id = session['user_id']
+
+    # Check if the user already voted on this article
+    existing_vote = Article_Vote.query.filter_by(article_id=article_id, user_id=user_id).first()
+
+    if existing_vote:
+        # Update existing vote
+        existing_vote.value = vote_value
+    else:
+        # Create a new vote
+        new_vote = Article_Vote(value=vote_value, article_id=article_id, user_id=user_id)
+        db.session.add(new_vote)
+
+    db.session.commit()
+    flash('Vote recorded successfully!', 'success')
+    return redirect(url_for('articles'))
+
+
+
 
 
 @app.route('/statistics')

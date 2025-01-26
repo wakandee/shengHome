@@ -36,5 +36,8 @@
     "song_description": "Song Description",
     "add_artist":"Add Atist",
     "artist_name":"Artist Name",
-    "artist_description": "Artist Description"
+    "select_artist":"Select Artist",
+    "artist_description": "Artist Description",
+
+    "add_article":"Add Article"
 }

@@ -5,12 +5,77 @@
 
     <!-- Articles Section -->
     <div class="lyrics-section">
-        <h3>Articles</h3>
-        <div class="lyrics-card">
-            <h4><a href="#">Life Ya Kuunda Web Ya Shengome</a></h4>
-            <p>Documenting Sheng has been a rewarding journey, driven by the desire to preserve and share this vibrant language. The project began with a simple idea and evolved into a comprehensive platform. Collaborating with others has enriched the experience, allowing us to create a resource that celebrates Sheng's cultural significance and engages users in meaningful ways.</p>
+        <div class="title_header">
+            <h3>Articles</h3>
+            {% if session.get('user_id') %}
+            <div class="add_button_container">
+                <a href="{{ url_for('add_article') }}" class="add_button">Add Article</a>
+            </div>
+            {% endif %}
         </div>
-    </div>
 
+
+        {% for article in articles %}
+            <div class="lyrics-card">
+                <h4><a href="#">{{ article.title }}</a></h4>
+                <p>{{ article.content }}</p>
+                <p>By: {{ article.author_name }} on {{ article.created_at.strftime('%Y-%m-%d') }}</p>
+
+                <div class="card_footer">
+                    <div class="vote_buttons">
+                        <button class="upvote_button" data-article-id="{{ article.id }}">▲ Upvote</button>
+                        <span class="vote_count">{{ article.votes_count }}</span>
+                        <button class="downvote_button" data-article-id="{{ article.id }}">▼ Downvote</button>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
 </div>
+<script type="text/javascript">
+    // Function to handle article voting
+const handleArticleVote = (articleId, voteType) => {
+    if (!articleId) {
+        alert("Invalid article ID");
+        return;
+    }
+
+    fetch('/article/vote', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify({ article_id: parseInt(articleId), vote_type: voteType })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert(data.error);
+        } else {
+            alert(data.message);
+            // Optionally reload or update the vote count dynamically
+            location.reload(); // Reloads the page to reflect the updated count
+        }
+    })
+    .catch(err => {
+        console.error('Error submitting vote:', err);
+        alert('An error occurred. Please try again.');
+    });
+};
+
+
+// Event delegation to handle voting button clicks
+document.addEventListener('click', (event) => {
+    if (event.target.classList.contains('upvote_button')) {
+        const articleId = event.target.getAttribute('data-article-id');
+        handleArticleVote(articleId, true); // True for upvote
+    } else if (event.target.classList.contains('downvote_button')) {
+        const articleId = event.target.getAttribute('data-article-id');
+        handleArticleVote(articleId, false); // False for downvote
+    }
+});
+
+</script>
 {% endblock %}

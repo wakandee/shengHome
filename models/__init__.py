@@ -13,4 +13,6 @@ from .synonyms import synonyms
 from .categories import Categories
 from .Artist import Artist
 from .Artist import Song
+from .Article import Article
+from .Article import Article_Vote
 # from models.translation import Translation  # Add other models here if necessary

@@ -22,3 +22,6 @@ class User(db.Model):
 
     # New column to capture date created
     date_created = db.Column(db.DateTime(timezone=True), default=func.now(), nullable=False)
+
+    # Relationship to Articles
+    articles = db.relationship('Article', back_populates='user', lazy=True)
