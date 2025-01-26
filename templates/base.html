@@ -130,10 +130,11 @@
         </div>
 
         <!-- Newsletter Subscription -->
+        <!-- Newsletter Subscription -->
         <div class="footer_newsletter">
             <h4>Stay Updated</h4>
-            <form class="newsletter_form">
-                <input type="email" placeholder="Enter your email" class="newsletter_input" required>
+            <form class="newsletter_form" id="newsletter_form">
+                <input type="email" id="newsletter_email" placeholder="Enter your email" class="newsletter_input" required>
                 <button type="submit" class="newsletter_button">Subscribe</button>
             </form>
         </div>
@@ -159,27 +160,38 @@
 
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
     <script type="text/javascript">
-            // Flash message functionality
-    document.addEventListener("DOMContentLoaded", function () {
-        const flashMessages = document.querySelectorAll(".flash-overlay");
+        // Handle the form submission for subscribing to the newsletter
+        document.getElementById('newsletter_form').addEventListener('submit', function (event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('newsletter_email').value;
 
-        flashMessages.forEach((message) => {
-            const closeBtn = message.querySelector(".close-btn");
-
-            // Auto-dismiss after 3 seconds
-            setTimeout(() => {
-                message.style.opacity = "0";
-                setTimeout(() => message.remove(), 500);
-            }, 3000);
-
-            // Close button functionality
-            closeBtn.addEventListener("click", () => {
-                message.style.opacity = "0";
-                setTimeout(() => message.remove(), 500);
+            fetch('/subscribe_newsletter', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email: email }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Subscription successful. Please check your email for confirmation.');
+                } else if (data.message === 'Unauthorized. Please sign in first.') {
+                    alert('Please sign in first.');
+                    window.location.href = '/login'; // Redirect to the login page
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(err => {
+                console.error('Error subscribing to newsletter:', err);
+                alert('An error occurred. Please try again.');
             });
         });
-    });
     </script>
+
 </body>
 </html>

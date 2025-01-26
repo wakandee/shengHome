@@ -15,4 +15,5 @@ from .Artist import Artist
 from .Artist import Song
 from .Article import Article
 from .Article import Article_Vote
+from .Newsletter_subscription import NewsletterSubscription
 # from models.translation import Translation  # Add other models here if necessary

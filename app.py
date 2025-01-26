@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, make_response, flash
 from config import Config # Import configuration settings
 from models import db, User, Avatar, UserVerification, Categories, synonyms, word_votes, words, Artist,Song
-from models import Article_Vote,Article
+from models import Article_Vote,Article,NewsletterSubscription
 from utils.db_helper import check_and_create_db
 from flask_migrate import Migrate
 import datetime
@@ -284,6 +284,45 @@ def logout():
     return redirect(url_for('home'))
 
 
+@app.route('/subscribe_newsletter', methods=['POST'])
+def subscribe_newsletter():
+    # Ensure the user is signed in
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Unauthorized. Please sign in first.'}), 401
+
+    # Get the email from the request
+    data = request.get_json()
+    email = data.get('email')
+
+    # Check if the email is already subscribed
+    existing_subscription = NewsletterSubscription.query.filter_by(email=email).first()
+
+    if existing_subscription:
+        # If the user is already subscribed, inform them
+        return jsonify({'success': False, 'message': 'This email is already subscribed.'}), 400
+
+    # Get the current user's ID from session
+    user_id = session['user_id']
+
+    # Retrieve the user's first name from the User table
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found.'}), 404
+
+    # Add the email to the subscription list with the user_id
+    new_subscription = NewsletterSubscription(email=email, user_id=user_id)
+    db.session.add(new_subscription)
+    db.session.commit()
+
+    # Send a confirmation email with the user's first name
+    email_body = f"Hi {user.fname},\n\nThank you for subscribing to our newsletter! We'll keep you updated with the latest news."
+    send_email(app, "Newsletter Subscription Confirmation", email, email_body)
+
+    return jsonify({'success': True, 'message': 'Subscription successful. Please check your email for confirmation.'}), 200
+
+
+
+
 def get_votes():
     # Query the word_votes table to calculate upvotes and downvotes for each word
     votes_data = db.session.query(
@@ -317,7 +356,8 @@ def get_words_with_votes():
         word.creator_name = f"{fname} {other_name}"  # Combine creator's name
         words_with_votes.append(word)
 
-    return words_with_votes
+    reversed_words = words_with_votes[::-1]
+    return reversed_words
 
 
 def search_words_with_votes(search_query):
