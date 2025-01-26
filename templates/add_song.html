@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="main_container">
+<div class="category_add_container">
+    <h2 class="category_add_header">{{ translations['add_song'] }}</h2>
+    <form action="{{ url_for('add_song') }}" method="POST" class="category_add_form">
+        <div class="category_add_form_group">
+            <label for="song_title" class="category_add_label">{{ translations['song_title'] }}:</label>
+            <input type="text" id="song_title" name="song_title" class="category_add_input" placeholder="{{ translations['enter_song_title'] }}" required>
+        </div>
+        <div class="category_add_form_group">
+            <label for="artist_id" class="category_add_label">{{ translations['select_artist'] }}:</label>
+            <select id="artist_id" name="artist_id" class="category_add_input" required>
+                <option value="" disabled selected>{{ translations['choose_artist'] }}</option>
+                {% for artist in artists %}
+                <option value="{{ artist.id }}">{{ artist.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="category_add_form_group">
+            <label for="song_description" class="category_add_label">{{ translations['song_description'] }}:</label>
+            <textarea id="song_description" name="song_description" class="category_add_textarea" placeholder="{{ translations['enter_song_description'] }}" required></textarea>
+        </div>
+        <button type="submit" class="category_add_button">{{ translations['add_song'] }}</button>
+    </form>
+</div>
+</div>
+{% endblock %}

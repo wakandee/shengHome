@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<div class="main_container">
 <div class="category_add_container">
     <h2 class="category_add_header">{{ translations['add_category'] }}</h2>
     <form action="{{ url_for('add_category') }}" method="POST" class="category_add_form">
@@ -18,5 +19,6 @@
         </div>
         <button type="submit" class="category_add_button">{{ translations['add_category'] }}</button>
     </form>
+</div>
 </div>
 {% endblock %}

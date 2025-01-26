@@ -24,7 +24,10 @@
                 <li class="{% if request.endpoint == 'home' %}active{% endif %}"><a href="{{ url_for('home') }}" class="nav-item">{{ translations['home'] }}</a></li>
                 <li class="{% if request.endpoint == 'translate' %}active{% endif %}"><a href="{{ url_for('translate') }}" class="nav-item">{{ translations['translate'] }}</a></li>
                 <li class="{% if request.endpoint == 'categories' %}active{% endif %}"><a href="{{ url_for('categories') }}" class="nav-item">{{ translations['categories'] }}</a></li>
+
                 <li class="{% if request.endpoint == 'lyrics' %}active{% endif %}"><a href="{{ url_for('lyrics') }}" class="nav-item">{{ translations['lyrics'] }}</a></li>
+               
+                <li class="{% if request.endpoint == 'articles' %}active{% endif %}"><a href="{{ url_for('articles') }}" class="nav-item">{{ translations['articles'] }}</a></li>
                 <li class="{% if request.endpoint == 'statistics' %}active{% endif %}"><a href="{{ url_for('statistics') }}" class="nav-item">statistics</a></li>
                 <!-- <li class="{% if request.endpoint == 'trending_phrases' %}active{% endif %}"><a href="{{ url_for('trending_phrases') }}" class="nav-item">Trending Phrases</a></li> -->
                 

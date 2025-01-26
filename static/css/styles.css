@@ -274,6 +274,10 @@ nav ul li.active a {
     justify-content: space-between;
     padding: 2%;
     flex-direction: column;
+
+    background: rgba(255, 255, 255, 0.2); /* Glassmorphism effect */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
 }
 
 /* Small devices (phones, 600px and down) */
@@ -1116,10 +1120,10 @@ p {
 
 /* Categories container */
 .categories_container {
-    background-color: rgba(255, 255, 255, 0.8);
+/*    background-color: rgba(255, 255, 255, 0.8);*/
     border-radius: 30px;
     padding: 20px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+/*    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);*/
     max-width: 900px;
     margin: 2% auto;
     backdrop-filter: blur(10px);
@@ -1164,6 +1168,7 @@ p {
     background: linear-gradient(145deg, #f0f0f0, #ffffff);
     border-radius: 20px;
     padding: 20px;
+    min-height: 200px;
     margin-bottom: 30px;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2), -5px -5px 15px rgba(255, 255, 255, 0.5);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -1221,6 +1226,7 @@ p {
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.5);
     cursor: pointer;
     transition: all 0.3s ease;
+    bottom: 0;
 }
 
 .view_more_button:hover {
@@ -1244,7 +1250,7 @@ p {
 
 /* Add Category Container */
 .category_add_container {
-    background-color: rgba(255, 255, 255, 0.8);
+/*    background-color: rgba(255, 255, 255, 0.8);*/
     border-radius: 30px;
     padding: 30px;
     max-width: 600px;
@@ -1343,12 +1349,48 @@ p {
 }
 
 /* Section Titles */
-.lyrics-section h3 {
+
+.lyrics-section .title_header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2% 0;
+}
+
+.lyrics-section .title_header h3 {
     font-size: 22px;
     font-weight: bold;
     margin-bottom: 15px;
     color: #007bff;
 }
+
+/* GitHub Button */
+.add_button_container {
+    text-align: center;
+}
+
+.add_button {
+    display: inline-block;
+    background: linear-gradient(145deg, #e0e0e0, #ffffff);
+    border-radius: 30px;
+    padding: 10px 25px;
+    color: #007bff; /* Changed to a visible color */
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    margin: auto;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2), -5px -5px 10px rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.add_button:hover {
+    background: linear-gradient(145deg, #ffffff, #e0e0e0);
+    color: #0056b3; /* Darker color on hover for better visibility */
+    box-shadow: 5px 5px 20px rgba(0, 0, 0, 0.3), -5px -5px 20px rgba(255, 255, 255, 0.6);
+}
+
 
 /* Lyrics Cards */
 .lyrics-card {
@@ -1627,10 +1669,11 @@ p {
     max-width: 700px; /* Wider form container */
     margin: 0 auto;
     padding: 20px;
-    background-color: #f9f9f9;
-    border: 1px solid #ddd;
+    background-color: inherit;
+/*    opacity: 50%;*/
+/*    border: 0.1px solid #ddd;*/
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 0.1px 0.5px rgba(0, 0, 0, 0.1);
 }
 
 /* Header Styling */

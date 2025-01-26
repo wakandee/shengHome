@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, make_response, flash
 from config import Config # Import configuration settings
-from models import db, User, Avatar, UserVerification, Categories, synonyms, word_votes, words
+from models import db, User, Avatar, UserVerification, Categories, synonyms, word_votes, words, Artist,Song
 from utils.db_helper import check_and_create_db
 from flask_migrate import Migrate
 import datetime
@@ -57,7 +57,7 @@ with app.app_context():
     inspector = inspect(db.engine)  # Create an inspector object
     
     # List of tables to check
-    required_tables = ['users', 'avatars', 'user_verifications', 'word_votes', 'synonyms', 'words', 'categories']
+    required_tables = ['users', 'avatars', 'user_verifications', 'word_votes', 'synonyms', 'words', 'categories', 'artist','artist_songs']
     
     existing_tables = inspector.get_table_names()  # Fetch existing tables
     
@@ -543,6 +543,84 @@ def lyrics():
     language = request.cookies.get('language') or 'en'
     translations = load_language(language)
     return render_template('lyrics.html', translations=translations)
+
+@app.route('/add_artist', methods=['GET', 'POST'])
+def add_artist():
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized, Please Sign in First"}), 401  # User not logged in
+
+    if request.method == 'POST':
+        artist_name = request.form.get('artist_name')
+        artist_description = request.form.get('artist_description')
+        created_by = session.get('user_id')  # Fetch user_id from session
+
+        # Check if the artist name already exists
+        existing_artist = Artist.query.filter_by(name=artist_name).first()
+
+        if existing_artist:
+            flash(f"Artist '{artist_name}' already exists!", 'error')
+        else:
+            if artist_name:
+                new_artist = Artist(
+                    name=artist_name,
+                    description=artist_description,
+                    created_by=created_by
+                )
+                db.session.add(new_artist)
+                db.session.commit()
+                flash('Artist Added Successfully', 'success')
+                return redirect(url_for('add_artist'))
+            else:
+                flash('Artist Name Required', 'error')
+
+    return render_template('add_artist.html', translations=translations)
+
+
+
+
+@app.route('/add_song', methods=['GET', 'POST'])
+def add_song():
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+
+    if 'user_id' not in session:
+        return jsonify({"error": "Unauthorized, Please Sign in First"}), 401  # User not logged in
+
+    artists = Artist.query.all()  # Fetch all available artists for the dropdown
+
+    if request.method == 'POST':
+        song_title = request.form.get('song_title')
+        song_description = request.form.get('song_description')
+        artist_id = request.form.get('artist_id')
+        created_by = session.get('user_id')  # Fetch user_id from session
+
+        if song_title and artist_id:
+            new_song = Song(
+                title=song_title,
+                description=song_description,
+                artist_id=int(artist_id),
+                created_by=created_by
+            )
+            db.session.add(new_song)
+            db.session.commit()
+            flash(translations['song_added_successfully'], 'success')
+            return redirect(url_for('add_song'))
+        else:
+            flash(translations['song_title_and_artist_required'], 'error')
+
+    return render_template('add_song.html', translations=translations, artists=artists)
+
+
+
+@app.route('/articles')
+def articles():
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+    return render_template('articles.html', translations=translations)
+
 
 @app.route('/statistics')
 def statistics():

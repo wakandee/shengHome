@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="main_container">
+<div class="category_add_container">
+    <h2 class="category_add_header">{{ translations['add_artist'] }}</h2>
+    <form action="{{ url_for('add_artist') }}" method="POST" class="category_add_form">
+        <div class="category_add_form_group">
+            <label for="artist_name" class="category_add_label">{{ translations['artist_name'] }}:</label>
+            <input type="text" id="artist_name" name="artist_name" class="category_add_input" placeholder="{{ translations['enter_artist_name'] }}" required>
+        </div>
+        <div class="category_add_form_group">
+            <label for="artist_description" class="category_add_label">{{ translations['artist_description'] }}:</label>
+            <textarea id="artist_description" name="artist_description" class="category_add_textarea" placeholder="{{ translations['enter_artist_description'] }}" required></textarea>
+        </div>
+        <button type="submit" class="category_add_button">{{ translations['add_artist'] }}</button>
+    </form>
+</div>
+</div>
+{% endblock %}

@@ -11,4 +11,6 @@ from .words import words
 from .word_votes import word_votes
 from .synonyms import synonyms
 from .categories import Categories
+from .Artist import Artist
+from .Artist import Song
 # from models.translation import Translation  # Add other models here if necessary
