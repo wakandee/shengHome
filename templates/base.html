@@ -34,7 +34,11 @@
 
                 <li class="{% if request.endpoint == 'about' %}active{% endif %}"><a href="{{ url_for('about') }}" class="nav-item">{{ translations['about'] }}</a></li>
 
+                <li class="{% if request.endpoint == 'contact_us' %}active{% endif %}"><a href="{{ url_for('contact_us') }}" class="nav-item">{{ translations['contact_us'] }}</a></li>
+
                 <li class="{% if request.endpoint == 'admin' %}active{% endif %}"><a href="{{ url_for('admin') }}" class="nav-item">{{ translations['admin'] }}</a></li>
+
+
                 
             </ul>
             <ul class="right">
@@ -192,6 +196,7 @@
             });
         });
     </script>
+    
 
 </body>
 </html>

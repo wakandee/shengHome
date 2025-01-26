@@ -427,6 +427,32 @@ def translate():
 
 
 
+@app.route('/contact_us', methods=['GET', 'POST'])
+def contact_us():
+    language = request.cookies.get('language') or 'en'
+    translations = load_language(language)
+
+    if request.method == 'POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        message = request.form.get('message')
+
+        # Example of logging the data
+        print(f"New contact message from {name} ({email}): {message}")
+
+        # Add your logic here: Save to database, send an email, etc.
+        # For example:
+        # save_to_database(name, email, message)
+        # or send_email(name, email, message)
+
+        flash('Your message has been sent successfully!', 'success')
+        return redirect(url_for('contact_us'))
+
+    return render_template('contact_us.html', translations=translations)
+
+
+
+
 
 @app.route('/word/vote', methods=['POST'])
 def vote_word():
