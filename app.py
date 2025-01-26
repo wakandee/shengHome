@@ -819,9 +819,63 @@ def vote(article_id, vote_value):
 
 @app.route('/statistics')
 def statistics():
+    # Total number of articles
+    total_articles = Article.query.count()
+
+    # Total number of users
+    total_users = User.query.count()
+
+    # Number of active newsletter subscriptions
+    total_subscriptions = NewsletterSubscription.query.count()
+
+    # Most popular articles based on vote count
+    popular_articles = db.session.query(
+        Article.title,
+        db.func.count(Article_Vote.article_id).label('votes_count')
+    ).join(Article_Vote, Article_Vote.article_id == Article.article_id).group_by(Article.article_id).order_by(db.func.count(Article_Vote.article_id).desc()).limit(5).all()
+
+    # Word vote statistics
+    word_vote_stats = db.session.query(
+        word_votes.word_id,
+        db.func.count(word_votes.id).label('vote_count')
+    ).group_by(word_votes.word_id).order_by(db.func.count(word_votes.id).desc()).limit(5).all()
+
+    # Total number of categories
+    total_categories = Categories.query.count()
+
+    # Most popular artists based on the number of songs
+    popular_artists = db.session.query(
+        Artist.name,
+        db.func.count(Song.id).label('songs_count')
+    ).join(Song, Song.artist_id == Artist.id).group_by(Artist.id).order_by(db.func.count(Song.id).desc()).limit(5).all()
+
+    # Total number of songs
+    total_songs = Song.query.count()
+
+    # Most active users (based on the number of articles they have contributed)
+    active_users = db.session.query(
+        User.fname,
+        User.other_name,
+        db.func.count(Article.article_id).label('articles_count')
+    ).join(Article, Article.created_by == User.user_id).group_by(User.user_id).order_by(db.func.count(Article.article_id).desc()).limit(5).all()
+
     language = request.cookies.get('language') or 'en'
     translations = load_language(language)
-    return render_template('statistics.html', translations=translations)
+    
+    return render_template(
+        'statistics.html',
+        total_articles=total_articles,
+        total_users=total_users,
+        total_subscriptions=total_subscriptions,
+        popular_articles=popular_articles,
+        word_vote_stats=word_vote_stats,
+        total_categories=total_categories,
+        popular_artists=popular_artists,
+        total_songs=total_songs,
+        active_users=active_users,
+        translations=translations
+    )
+
 
 @app.route('/about')
 def about():
